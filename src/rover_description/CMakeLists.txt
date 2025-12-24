@@ -12,7 +12,13 @@ find_package(ament_cmake REQUIRED)
 # find_package(<dependency> REQUIRED)
 
 install(
-  DIRECTORY launch urdf meshes config
+  PROGRAMS
+    scripts/teleop.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+install(
+  DIRECTORY launch urdf meshes config worlds scripts
   DESTINATION share/${PROJECT_NAME}
 )
 

@@ -10,16 +10,14 @@ from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
 def generate_launch_description():
-    # Get paths for packages and files
     pkg_path = get_package_share_directory('rover_description')
     ros_gz_sim_dir = get_package_share_directory('ros_gz_sim')
     urdf_path = os.path.join(pkg_path, 'urdf', 'rover.urdf')
-    world_file = "empty.sdf"
+    world_file = os.path.join(pkg_path, 'worlds', 'empty.world')
     
-    # Load the robot description from the xacro file
     with open(urdf_path, 'r') as infp:
         robot_description = infp.read()
-    # Launch Gazebo Sim
+
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(ros_gz_sim_dir, 'launch', 'gz_sim.launch.py')
@@ -29,7 +27,6 @@ def generate_launch_description():
         }.items()
     )
 
-    # Spawn the robot state publisher
     robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -45,6 +42,28 @@ def generate_launch_description():
         output='screen'
     )
 
+    cameras_lidar_bridge = Node(
+    package='ros_gz_bridge',
+    executable='parameter_bridge',
+    arguments=[
+        '/camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
+        '/camera_1/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
+        '/camera_2/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
+        '/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
+    ],
+    output='screen'
+    )
+    
+    imu_gps_bridge = Node(
+    package='ros_gz_bridge',
+    executable='parameter_bridge',
+    arguments=[
+       '/imu@sensor_msgs/msg/Imu[gz.msgs.IMU',
+       '/gps/fix@sensor_msgs/msg/NavSatFix[gz.msgs.NavSat',
+    ],
+    output='screen'
+    )
+    
     spawn_robot = Node(
         package='ros_gz_sim',
         executable='create',
@@ -62,6 +81,8 @@ def generate_launch_description():
     return LaunchDescription([
         gz_sim,
         clock_bridge,
+        cameras_lidar_bridge,
+        imu_gps_bridge,
         robot_state_publisher,
         spawn_robot, 
     ])
