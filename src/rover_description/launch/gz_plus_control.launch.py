@@ -12,7 +12,8 @@ def generate_launch_description():
     
     gazebo_launch_path = os.path.join(pkg_share, 'launch', 'gazebo_sim.launch.py')
     controllers_launch_path = os.path.join(pkg_share, 'launch', 'controllers.launch.py')
-
+    ekf_launch_path = os.path.join(pkg_share, 'launch', 'dual_ekf_navsat.launch.py')
+    
     gazebo_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(gazebo_launch_path),
         launch_arguments={'use_sim_time': 'true'}.items()
@@ -23,7 +24,13 @@ def generate_launch_description():
         launch_arguments={'use_sim_time': 'true'}.items()
     )
 
+    ekf = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(ekf_launch_path),
+        launch_arguments={'use_sim_time': 'true'}.items()
+    )
+
     return LaunchDescription([
         gazebo_sim,
-        controllers
+        controllers,
+        ekf,
     ])

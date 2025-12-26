@@ -228,7 +228,7 @@
     </joint>
 
     <gazebo reference="gps_link">
-      <sensor name="gps_sensor" type="navsat">
+      <sensor name="gps_link" type="navsat">
         <always_on>1</always_on>
         <update_rate>250</update_rate>
         <topic>gps/fix</topic>
