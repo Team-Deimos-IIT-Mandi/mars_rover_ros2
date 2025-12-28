@@ -31,7 +31,8 @@ def generate_launch_description():
                     package='controller_manager',
                     executable='spawner',
                     arguments=['diff_drive_controller', '--param-file', ros2_control_path],
-                    remappings=[('/diff_drive_controller/cmd_vel', '/diff_drive_controller/cmd_vel_stamped')],
+                    remappings=[('/diff_drive_controller/cmd_vel', '/diff_drive_controller/cmd_vel_stamped'),
+                                ],
                     output='screen'
                 )
             ]
