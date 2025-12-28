@@ -380,22 +380,12 @@
           <geometry>
 				        <cylinder radius="0.11" length="0.144"/>
 			   </geometry>
-         <surface>
-        <friction>
-          <ode>
-            <mu>0.5</mu>      
-            <mu2>0.5</mu2>    
-            <slip1>0.0</slip1>
-            <slip2>0.0</slip2>
-          </ode>
-        </friction>
-  </surface>
         </collision>
       </link>
 
       <gazebo reference="wheel1">
         <material>Gazebo/DarkGrey</material>
-        <mu1>0.5</mu1>
+        <mu1>1.5</mu1>
         <mu2>0.5</mu2>
     </gazebo>
 
@@ -507,22 +497,12 @@
           <geometry>
 				        <cylinder radius="0.11" length="0.144"/>
 			   </geometry>
-         <surface>
-          <friction>
-            <ode>
-              <mu>0.5</mu>      
-              <mu2>0.5</mu2>   
-              <slip1>0.0</slip1>
-              <slip2>0.0</slip2>
-            </ode>
-          </friction>
-        </surface>
         </collision>
       </link>
 
       <gazebo reference="wheel2">
         <material>Gazebo/DarkGrey</material>
-        <mu1>0.5</mu1>
+        <mu1>1.5</mu1>
         <mu2>0.5</mu2>
     </gazebo>
 
@@ -634,22 +614,12 @@
           <geometry>
 				        <cylinder radius="0.11" length="0.144"/>
 			   </geometry>
-         <surface>
-          <friction>
-            <ode>
-              <mu>0.5</mu>      
-              <mu2>0.5</mu2>   
-              <slip1>0.0</slip1>
-              <slip2>0.0</slip2>
-            </ode>
-          </friction>
-        </surface>
         </collision>
       </link>
 
       <gazebo reference="wheel3">
         <material>Gazebo/DarkGrey</material>
-        <mu1>0.5</mu1>
+        <mu1>1.5</mu1>
         <mu2>0.5</mu2>
     </gazebo>
 
@@ -763,21 +733,11 @@
 				        <cylinder radius="0.11" length="0.144"/>
 			   </geometry>
         </collision>
-        <surface>
-          <friction>
-            <ode>
-              <mu>0.5</mu>    
-              <mu2>0.5</mu2>    
-              <slip1>0.0</slip1>
-              <slip2>0.0</slip2>
-            </ode>
-          </friction>
-        </surface>
       </link>
 
       <gazebo reference="wheel4">
         <material>Gazebo/DarkGrey</material>
-        <mu1>0.5</mu1>
+        <mu1>1.5</mu1>
         <mu2>0.5</mu2>
     </gazebo>
 
@@ -824,7 +784,7 @@
     <gazebo>
       <plugin
         filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-        <parameters>/home/naman72060/rover_ws/src/rover_description/config/controllers.yaml</parameters>
+        <parameters>/home/anish/test/mars_rover_ros2/install/rover_description/share/rover_description/config/controllers.yaml</parameters>
       </plugin>
 
       <plugin
