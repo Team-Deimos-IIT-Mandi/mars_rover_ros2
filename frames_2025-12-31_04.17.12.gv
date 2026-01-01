@@ -1,6 +1,6 @@
 digraph G {
-"base_link" -> "base_footprint"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
-"odom" -> "base_link"[label=" Broadcaster: default_authority\nAverage rate: 31.429\nBuffer length: 0.7\nMost recent transform: 3.132\nOldest transform: 2.432\n"];
+"base_footprint" -> "base_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"odom" -> "base_footprint"[label=" Broadcaster: default_authority\nAverage rate: 31.008\nBuffer length: 1.032\nMost recent transform: 2.564\nOldest transform: 1.532\n"];
 "chassis" -> "camera_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
 "base_link" -> "chassis"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
 "chassis" -> "camera_link_1"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
@@ -12,12 +12,14 @@ digraph G {
 "chassis" -> "steering2"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
 "chassis" -> "steering4"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
 "chassis" -> "steering3"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
-"steering1" -> "wheel1"[label=" Broadcaster: default_authority\nAverage rate: 20.71\nBuffer length: 0.676\nMost recent transform: 3.12\nOldest transform: 2.444\n"];
-"steering2" -> "wheel2"[label=" Broadcaster: default_authority\nAverage rate: 20.71\nBuffer length: 0.676\nMost recent transform: 3.12\nOldest transform: 2.444\n"];
-"steering3" -> "wheel3"[label=" Broadcaster: default_authority\nAverage rate: 20.71\nBuffer length: 0.676\nMost recent transform: 3.12\nOldest transform: 2.444\n"];
-"steering4" -> "wheel4"[label=" Broadcaster: default_authority\nAverage rate: 20.71\nBuffer length: 0.676\nMost recent transform: 3.12\nOldest transform: 2.444\n"];
+"map" -> "utm"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"map" -> "odom"[label=" Broadcaster: default_authority\nAverage rate: 31.008\nBuffer length: 1.032\nMost recent transform: 2.568\nOldest transform: 1.536\n"];
+"steering1" -> "wheel1"[label=" Broadcaster: default_authority\nAverage rate: 20.243\nBuffer length: 0.988\nMost recent transform: 2.548\nOldest transform: 1.56\n"];
+"steering2" -> "wheel2"[label=" Broadcaster: default_authority\nAverage rate: 20.243\nBuffer length: 0.988\nMost recent transform: 2.548\nOldest transform: 1.56\n"];
+"steering3" -> "wheel3"[label=" Broadcaster: default_authority\nAverage rate: 20.243\nBuffer length: 0.988\nMost recent transform: 2.548\nOldest transform: 1.56\n"];
+"steering4" -> "wheel4"[label=" Broadcaster: default_authority\nAverage rate: 20.243\nBuffer length: 0.988\nMost recent transform: 2.548\nOldest transform: 1.56\n"];
 edge [style=invis];
  subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
-"Recorded at time: 1766941740.9997013"[ shape=plaintext ] ;
-}->"odom";
+"Recorded at time: 1767134832.6361535"[ shape=plaintext ] ;
+}->"map";
 }

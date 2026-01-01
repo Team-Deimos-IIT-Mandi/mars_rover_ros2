@@ -4,10 +4,10 @@
     <link name = "base_link"/>
     <link name = "base_footprint"/>
 
-    <joint name="base_footprint_tf" type="fixed">
+    <joint name="base_footprint_joint" type="fixed">
       <origin xyz="0 0 0" rpy="0 0 0"/>
-      <parent link="base_link"/>
-      <child link="base_footprint"/>
+      <parent link="base_footprint"/>
+      <child link="base_link"/>
     </joint>
 
       <link
@@ -233,6 +233,7 @@
         <always_on>1</always_on>
         <update_rate>250</update_rate>
         <topic>gps/fix</topic>
+        <gz_frame_id>gps_link</gz_frame_id>
       </sensor>
     </gazebo>
 
@@ -784,7 +785,7 @@
     <gazebo>
       <plugin
         filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-        <parameters>/home/anish/test/mars_rover_ros2/install/rover_description/share/rover_description/config/controllers.yaml</parameters>
+        <parameters>/home/naman72060/rover_ws/src/rover_description/config/controllers.yaml</parameters>
       </plugin>
 
       <plugin

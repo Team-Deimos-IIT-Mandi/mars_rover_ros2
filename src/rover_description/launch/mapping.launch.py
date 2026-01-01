@@ -16,12 +16,14 @@ def generate_launch_description():
         executable='cartographer_node',
         name='mapping_node',
         output='screen',
-        arguments=['-configuration_directory', config_dir,
-                   '-configuration_basename','rover.lua'],
+        parameters=[{'use_sim_time': True}],
+        arguments=[ '-configuration_directory', config_dir,
+                    '-configuration_basename','rover.lua'],
         remappings=[
                 ('/imu', '/imu'), 
                 ('/scan', '/scan'),
-                ('/odom', '/odometry/filtered') 
+                ('/odom', '/odometry/global'),
+                ('/fix', '/gps/fix')
             ]
         ),
     Node(
