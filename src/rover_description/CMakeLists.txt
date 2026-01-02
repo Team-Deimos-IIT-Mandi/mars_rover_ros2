@@ -14,11 +14,12 @@ find_package(ament_cmake REQUIRED)
 install(
   PROGRAMS
     scripts/teleop.py
+    scripts/goal_to_pose.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
 install(
-  DIRECTORY launch urdf meshes config worlds scripts
+  DIRECTORY launch urdf meshes config worlds scripts maps
   DESTINATION share/${PROJECT_NAME}
 )
 

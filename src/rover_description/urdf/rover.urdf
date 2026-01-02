@@ -265,7 +265,7 @@
       <sensor name="gpu_lidar" type="gpu_lidar">
         <pose>0 0 0 0 0 0</pose>
         <topic>scan</topic>
-        <update_rate>10</update_rate>
+        <update_rate>20</update_rate>
         <gz_frame_id>lidar_link</gz_frame_id>
         <lidar>
           <scan>
@@ -402,6 +402,7 @@
           link="wheel1" />
         <axis
           xyz="0 0 1" />
+        <limit effort="100.0" velocity="20.0"/>
       </joint>
       <link
         name="steering2">
@@ -519,6 +520,7 @@
           link="wheel2" />
         <axis
           xyz="0 0 1" />
+        <limit effort="100.0" velocity="20.0"/>
       </joint>
       <link
         name="steering3">
@@ -636,6 +638,7 @@
           link="wheel3" />
         <axis
           xyz="0 0 1" />
+        <limit effort="100.0" velocity="20.0"/>
       </joint>
       <link
         name="steering4">
@@ -754,6 +757,7 @@
           link="wheel4" />
         <axis
           xyz="0 0 1" />
+        <limit effort="100.0" velocity="20.0"/>
       </joint>
 
     <ros2_control name="RobotController" type="system">
