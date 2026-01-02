@@ -1,0 +1,46 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100
+    use_sim_time : true 
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    diff_drive_controller:
+      type: diff_drive_controller/DiffDriveController
+
+
+diff_drive_controller:
+  ros__parameters:
+
+    
+    left_wheel_names:  ["wheel_1", "wheel_4"]
+    right_wheel_names: ["wheel_2", "wheel_3"]
+
+    # Physical dimensions 
+    wheel_radius: 0.11
+    wheel_separation: 0.58   # measure left ↔ right distance
+
+    # Frames
+    base_frame_id: base_link
+    odom_frame_id: odom
+
+    # TF
+    enable_odom_tf: true
+
+    # Timing
+    publish_rate: 50.0
+    cmd_vel_timeout: 0.5
+
+    # Limits
+    linear:
+      x:
+        has_velocity_limits: true
+        max_velocity: 1.0
+        min_velocity: -1.0
+
+    angular:
+      z:
+        has_velocity_limits: true
+        max_velocity: 2.0
+        min_velocity: -2.0

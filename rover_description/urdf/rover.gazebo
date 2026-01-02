@@ -1,0 +1,218 @@
+<?xml version="1.0"?>
+<robot>
+
+
+  <!-- ========================================================= -->
+  <!-- Gazebo Materials -->
+  <!-- ========================================================= -->
+
+  <gazebo reference="chassis">
+    <material>Gazebo/Orange</material>
+  </gazebo>
+
+  <gazebo reference="camera_link">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+  <gazebo reference="camera_link_1">
+    <material>Gazebo/Red</material>
+  </gazebo>
+
+  <gazebo reference="camera_link_2">
+    <material>Gazebo/Green</material>
+  </gazebo>
+
+  <gazebo reference="imu_link">
+    <material>Gazebo/Yellow</material>
+  </gazebo>
+
+  <!-- ========================================================= -->
+  <!-- Wheel Contact Parameters -->
+  <!-- ========================================================= -->
+
+  <gazebo reference="wheel1">
+    <material>Gazebo/DarkGrey</material>
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+    <self_collide>false</self_collide>
+    <kp>1000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+  <gazebo reference="wheel2">
+    <material>Gazebo/DarkGrey</material>
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+    <self_collide>false</self_collide>
+    <kp>1000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+  <gazebo reference="wheel3">
+    <material>Gazebo/DarkGrey</material>
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+    <self_collide>false</self_collide>
+    <kp>1000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+  <gazebo reference="wheel4">
+    <material>Gazebo/DarkGrey</material>
+    <mu1>1.0</mu1>
+    <mu2>1.0</mu2>
+    <self_collide>false</self_collide>
+    <kp>1000.0</kp>
+    <kd>1.0</kd>
+  </gazebo>
+
+  <!-- ========================================================= -->
+  <!-- ros2_control (Gazebo Harmonic) -->
+  <!-- ========================================================= -->
+
+  <gazebo>
+    <plugin
+      filename="gz_ros2_control-system"
+      name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <parameters>
+        $(find rover_description)/config/rover_controllers.yaml
+      </parameters>
+    </plugin>
+  </gazebo>
+
+  <!-- ========================================================= -->
+  <!-- Gazebo Sensors System (ONLY ONCE) -->
+  <!-- ========================================================= -->
+
+  <gazebo>
+    <plugin
+      filename="gz-sim-sensors-system"
+      name="gz::sim::systems::Sensors">
+      <render_engine>ogre2</render_engine>
+    </plugin>
+  </gazebo>
+
+  <!-- ========================================================= -->
+  <!-- Cameras -->
+  <!-- ========================================================= -->
+
+  <!-- Front Depth Camera -->
+  <gazebo reference="camera_link">
+    <sensor name="front_depth_camera" type="depth_camera">
+      <topic>/front_camera</topic>
+      <update_rate>30</update_rate>
+      <visualize>true</visualize>
+
+      <camera>
+        <horizontal_fov>1.047198</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.05</near>
+          <far>30</far>
+        </clip>
+      </camera>
+    </sensor>
+  </gazebo>
+
+  <!-- Left RGB Camera -->
+  <gazebo reference="camera_link_2">
+    <sensor name="left_camera" type="camera">
+      <topic>/left_camera</topic>
+      <update_rate>30</update_rate>
+      <visualize>true</visualize>
+
+      <camera>
+        <horizontal_fov>1.047198</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.05</near>
+          <far>30</far>
+        </clip>
+      </camera>
+    </sensor>
+  </gazebo>
+
+  <!-- Right RGB Camera -->
+  <gazebo reference="camera_link_1">
+    <sensor name="right_camera" type="camera">
+      <topic>/right_camera</topic>
+      <update_rate>30</update_rate>
+      <visualize>true</visualize>
+
+      <camera>
+        <horizontal_fov>1.047198</horizontal_fov>
+        <image>
+          <width>640</width>
+          <height>480</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.05</near>
+          <far>30</far>
+        </clip>
+      </camera>
+    </sensor>
+  </gazebo>
+
+  <!-- ========================================================= -->
+  <!-- IMU -->
+  <!-- ========================================================= -->
+
+  <gazebo reference="imu_link">
+    <sensor name="imu_sensor" type="imu">
+      <topic>/imu</topic>
+      <update_rate>100</update_rate>
+      <visualize>true</visualize>
+
+      <imu>
+        <angular_velocity>
+          <x><noise type="gaussian"><mean>0</mean><stddev>0.005</stddev></noise></x>
+          <y><noise type="gaussian"><mean>0</mean><stddev>0.005</stddev></noise></y>
+          <z><noise type="gaussian"><mean>0</mean><stddev>0.005</stddev></noise></z>
+        </angular_velocity>
+
+        <linear_acceleration>
+          <x><noise type="gaussian"><mean>0</mean><stddev>0.01</stddev></noise></x>
+          <y><noise type="gaussian"><mean>0</mean><stddev>0.01</stddev></noise></y>
+          <z><noise type="gaussian"><mean>0</mean><stddev>0.01</stddev></noise></z>
+        </linear_acceleration>
+      </imu>
+    </sensor>
+  </gazebo>
+
+  <!-- ========================================================= -->
+  <!-- GPS -->
+  <!-- ========================================================= -->
+
+  <gazebo reference="base_link">
+    <sensor name="gps_sensor" type="navsat">
+      <topic>/gps</topic>
+      <update_rate>40</update_rate>
+      <visualize>true</visualize>
+
+      <navsat>
+        <reference_latitude>49.9</reference_latitude>
+        <reference_longitude>8.9</reference_longitude>
+        <reference_altitude>0</reference_altitude>
+
+        <position_sensing>
+          <horizontal>
+            <noise type="gaussian"><mean>0</mean><stddev>0.5</stddev></noise>
+          </horizontal>
+          <vertical>
+            <noise type="gaussian"><mean>0</mean><stddev>1.0</stddev></noise>
+          </vertical>
+        </position_sensing>
+      </navsat>
+    </sensor>
+  </gazebo>
+
+</robot>
