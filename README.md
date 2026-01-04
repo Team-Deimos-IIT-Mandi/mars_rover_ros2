@@ -124,15 +124,15 @@ utm -> map -> odom -> base_footprint -> base_link -> chassis -> [sensors/wheels]
 ```mermaid
 graph TD
     subgraph Sensors
-        GPS[GPS Receiver<br/>/gps/fix]
-        IMU[IMU<br/>/imu]
-        Encoders[Wheel Encoders<br/>/diff_drive_controller/odom]
+        GPS["GPS Receiver - /gps/fix"]
+        IMU["IMU - /imu"]
+        Encoders["Wheel Encoders - /diff_drive_controller/odom"]
     end
 
-    subgraph "Robot Localization (Sensor Fusion)"
+    subgraph "Robot Localization - Sensor Fusion"
         NavSat[navsat_transform_node]
-        EKF_Local[ekf_filter_node_odom<br/>(Local EKF)]
-        EKF_Global[ekf_filter_node_map<br/>(Global EKF)]
+        EKF_Local["ekf_filter_node_odom - Local EKF"]
+        EKF_Global["ekf_filter_node_map - Global EKF"]
     end
 
     subgraph "Navigation Stack"
@@ -151,12 +151,12 @@ graph TD
     NavSat -- /odometry/gps --> EKF_Global
     
     EKF_Local -- /odometry/local --> Nav2
-    EKF_Local -- tf: odom->base_footprint --> TF_Tree[TF Tree]
+    EKF_Local -- "tf: odom->base_footprint" --> TF_Tree[TF Tree]
     
     EKF_Global -- /odometry/global --> Nav2
-    EKF_Global -- tf: map->odom --> TF_Tree
+    EKF_Global -- "tf: map->odom" --> TF_Tree
     
-    WaypointNode -- Action: FollowWaypoints --> Nav2
+    WaypointNode -- "Action: FollowWaypoints" --> Nav2
 ```
 
 ### Sensor Fusion and Localization
