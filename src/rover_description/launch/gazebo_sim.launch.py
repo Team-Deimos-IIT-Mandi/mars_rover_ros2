@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-
 import os
+import re
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, SetEnvironmentVariable
@@ -8,6 +8,26 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
+
+def resolve_package_path(urdf_content, pkg_path):
+    """Replace package:// URIs and hardcoded paths with absolute paths"""
+    mesh_path = os.path.join(pkg_path, 'meshes')
+    config_path = os.path.join(pkg_path, 'config', 'controllers.yaml')
+    
+    # Replace package://rover_description/meshes
+    urdf_content = urdf_content.replace(
+        'package://rover_description/meshes',
+        f'file://{mesh_path}'
+    )
+    
+    # Regex to replace the hardcoded controllers.yaml path
+    # Matches <parameters>.../config/controllers.yaml</parameters>
+    pattern = r'<parameters>.*controllers\.yaml</parameters>'
+    # check for alternatives to fix the fixed controllers yaml path in urdf 
+    replacement = f'<parameters>{config_path}</parameters>'
+    urdf_content = re.sub(pattern, replacement, urdf_content)
+    
+    return urdf_content
 
 def generate_launch_description():
     pkg_path = get_package_share_directory('rover_description')
@@ -17,6 +37,9 @@ def generate_launch_description():
     
     with open(urdf_path, 'r') as infp:
         robot_description = infp.read()
+    
+    # Process the URDF to fix paths
+    robot_description = resolve_package_path(robot_description, pkg_path)
 
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
