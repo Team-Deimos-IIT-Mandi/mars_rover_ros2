@@ -15,6 +15,8 @@ install(
   PROGRAMS
     scripts/teleop.py
     scripts/goal_to_pose.py
+    scripts/gps_waypoint_follower.py
+    scripts/cmd_vel_relay.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

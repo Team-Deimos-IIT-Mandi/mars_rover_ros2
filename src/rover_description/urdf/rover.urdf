@@ -290,17 +290,17 @@
         name="steering1">
         <inertial>
           <origin
-            xyz="0.000525112226394842 -0.0335326994132589 -0.193802692885311"
+            xyz="0 0 0"
             rpy="0 0 0" />
           <mass
-            value="6.64830273269256" />
+            value="0.5" />
           <inertia
-            ixx="0.0236327074483744"
-            ixy="1.53496169623355E-05"
-            ixz="6.57674614863919E-06"
-            iyy="0.019303321564257"
-            iyz="-0.00126381697267368"
-            izz="0.0217357170628441" />
+            ixx="0.0018"
+            ixy="0.0"
+            ixz="0.0"
+            iyy="0.0015"
+            iyz="0.0"
+            izz="0.0017" />
         </inertial>
         <visual>
           <origin
@@ -386,8 +386,12 @@
 
       <gazebo reference="wheel1">
         <material>Gazebo/DarkGrey</material>
-        <mu1>1.5</mu1>
-        <mu2>0.5</mu2>
+        <mu1>1.0</mu1>
+        <mu2>0.2</mu2>
+        <fdir1>1 0 0</fdir1>
+        <minDepth>0.001</minDepth>
+        <kp>100000000.0</kp>
+        <kd>1.0</kd>
     </gazebo>
 
       <joint
@@ -402,23 +406,23 @@
           link="wheel1" />
         <axis
           xyz="0 0 1" />
-        <limit effort="100.0" velocity="20.0"/>
+        <limit effort="1000.0" velocity="20.0"/>
       </joint>
       <link
         name="steering2">
         <inertial>
           <origin
-            xyz="-0.000474889077884733 0.0341947940956224 -0.19380284134621"
+            xyz="0 0 0"
             rpy="0 0 0" />
           <mass
-            value="6.64830400801289" />
+            value="0.5" />
           <inertia
-            ixx="0.0236304005612626"
-            ixy="0.000114678117693231"
-            ixz="-3.02547344080121E-05"
-            iyy="0.019306197957872"
-            iyz="0.00125759688431803"
-            izz="0.0217350588985547" />
+            ixx="0.0018"
+            ixy="0.0"
+            ixz="0.0"
+            iyy="0.0015"
+            iyz="0.0"
+            izz="0.0017" />
         </inertial>
         <visual>
           <origin
@@ -504,8 +508,12 @@
 
       <gazebo reference="wheel2">
         <material>Gazebo/DarkGrey</material>
-        <mu1>1.5</mu1>
-        <mu2>0.5</mu2>
+        <mu1>1.0</mu1>
+        <mu2>0.2</mu2>
+        <fdir1>1 0 0</fdir1>
+        <minDepth>0.001</minDepth>
+        <kp>100000000.0</kp>
+        <kd>1.0</kd>
     </gazebo>
 
       <joint
@@ -520,23 +528,23 @@
           link="wheel2" />
         <axis
           xyz="0 0 1" />
-        <limit effort="100.0" velocity="20.0"/>
+        <limit effort="1000.0" velocity="20.0"/>
       </joint>
       <link
         name="steering3">
         <inertial>
           <origin
-            xyz="-0.000416600731458772 0.0335152875528032 -0.193802433433151"
+            xyz="0 0 0"
             rpy="0 0 0" />
           <mass
-            value="6.64830392215954" />
+            value="0.5" />
           <inertia
-            ixx="0.0236333353649771"
-            ixy="1.52860727031699E-06"
-            ixz="-3.17219019035638E-06"
-            iyy="0.0193032353280473"
-            iyz="0.00126391062872571"
-            izz="0.0217350863633826" />
+            ixx="0.0018"
+            ixy="0.0"
+            ixz="0.0"
+            iyy="0.0015"
+            iyz="0.0"
+            izz="0.0017" />
         </inertial>
         <visual>
           <origin
@@ -622,8 +630,12 @@
 
       <gazebo reference="wheel3">
         <material>Gazebo/DarkGrey</material>
-        <mu1>1.5</mu1>
-        <mu2>0.5</mu2>
+        <mu1>1.0</mu1>
+        <mu2>0.2</mu2>
+        <fdir1>1 0 0</fdir1>
+        <minDepth>0.001</minDepth>
+        <kp>100000000.0</kp>
+        <kd>1.0</kd>
     </gazebo>
 
       <joint
@@ -638,23 +650,23 @@
           link="wheel3" />
         <axis
           xyz="0 0 1" />
-        <limit effort="100.0" velocity="20.0"/>
+        <limit effort="1000.0" velocity="20.0"/>
       </joint>
       <link
         name="steering4">
         <inertial>
           <origin
-            xyz="-0.00011106391877802 -0.0338081154233735 -0.19380292769291"
+            xyz="0 0 0"
             rpy="0 0 0" />
           <mass
-            value="6.64830259385427" />
+            value="0.5" />
           <inertia
-            ixx="0.0236324149128355"
-            ixy="4.11539442084093E-05"
-            ixz="8.21164009695582E-06"
-            iyy="0.0193036407758429"
-            iyz="-0.00125789757300897"
-            izz="0.0217356897618841" />
+            ixx="0.0018"
+            ixy="0.0"
+            ixz="0.0"
+            iyy="0.0015"
+            iyz="0.0"
+            izz="0.0017" />
         </inertial>
         <visual>
           <origin
@@ -741,8 +753,12 @@
 
       <gazebo reference="wheel4">
         <material>Gazebo/DarkGrey</material>
-        <mu1>1.5</mu1>
-        <mu2>0.5</mu2>
+        <mu1>1.0</mu1>
+        <mu2>0.2</mu2>
+        <fdir1>1 0 0</fdir1>
+        <minDepth>0.001</minDepth>
+        <kp>100000000.0</kp>
+        <kd>1.0</kd>
     </gazebo>
 
       <joint
@@ -757,7 +773,7 @@
           link="wheel4" />
         <axis
           xyz="0 0 1" />
-        <limit effort="100.0" velocity="20.0"/>
+        <limit effort="1000.0" velocity="20.0"/>
       </joint>
 
     <ros2_control name="RobotController" type="system">
@@ -789,7 +805,7 @@
     <gazebo>
       <plugin
         filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-        <parameters>/home/naman72060/rover_ws/src/rover_description/config/controllers.yaml</parameters>
+        <parameters>/home/anish/test/mars_rover_ros2/src/rover_description/config/controllers.yaml</parameters>
       </plugin>
 
       <plugin

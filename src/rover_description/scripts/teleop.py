@@ -26,7 +26,7 @@ class StampedTeleop(Node):
         
         self.settings = termios.tcgetattr(sys.stdin)
         self.linear_vel = 1.5
-        self.angular_vel = 2.0
+        self.angular_vel = 0.5
         
         self.get_logger().info(msg)
 
