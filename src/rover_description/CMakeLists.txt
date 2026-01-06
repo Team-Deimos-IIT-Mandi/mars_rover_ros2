@@ -14,14 +14,16 @@ find_package(ament_cmake REQUIRED)
 install(
   PROGRAMS
     scripts/teleop.py
-    scripts/goal_to_pose.py
     scripts/gps_waypoint_follower.py
     scripts/cmd_vel_relay.py
+    scripts/aruco_detection.py
+    scripts/aruco_detection1.py
+    scripts/aruco_detection2.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
 install(
-  DIRECTORY launch urdf meshes config worlds scripts maps
+  DIRECTORY launch urdf meshes config worlds scripts maps 
   DESTINATION share/${PROJECT_NAME}
 )
 
