@@ -84,7 +84,7 @@
     <gazebo reference="camera_link">
         <sensor name="rgbd_camera" type="rgbd_camera">
           <always_on>1</always_on>
-          <update_rate>250</update_rate>
+          <update_rate>100</update_rate>
           <visualize>1</visualize>
           <topic>rgbd_camera</topic>
           <gz_frame_id>camera_link</gz_frame_id>
@@ -128,7 +128,7 @@
     <gazebo reference="camera_link_1">
         <sensor name="camera_sensor_1" type="camera">
           <always_on>1</always_on>
-          <update_rate>250</update_rate>
+          <update_rate>100</update_rate>
           <visualize>1</visualize>
           <topic>camera_1/image_raw</topic>
           
@@ -171,7 +171,7 @@
     <gazebo reference="camera_link_2">
         <sensor name="camera_sensor_2" type="camera">
           <always_on>1</always_on>
-          <update_rate>250</update_rate>
+          <update_rate>100</update_rate>
           <visualize>1</visualize>
           <topic>camera_2/image_raw</topic>
           
