@@ -24,7 +24,7 @@ install(
 )
 
 install(
-  DIRECTORY launch urdf meshes config worlds scripts maps models
+  DIRECTORY launch urdf meshes config worlds scripts maps 
   DESTINATION share/${PROJECT_NAME}
 )
 

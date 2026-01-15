@@ -17,6 +17,7 @@ class ArUcoDetectionNode(Node):
 
         # 1. Configuration Parameters
         self.global_goal_sent = False
+        self.dist_threshold = 6.5
         self.mission_started = False
         self.start_sub = self.create_subscription(Bool, '/start_search', self.start_cb, 10)
         f = 554.26
@@ -90,10 +91,6 @@ class ArUcoDetectionNode(Node):
         corners, ids, _ = self.detector.detectMarkers(gray)
 
         if ids is not None:
-            self.global_goal_sent = True # Lock locally immediately
-            self.sync_pub.publish(Bool(data=True)) # Lock globally
-            self.ar_signal_pub.publish(Bool(data=True)) # Stop spiral
-
             for i in range(len(ids)):
                 # solvePnP replaces the deprecated estimatePoseSingleMarkers
                 _, rvec, tvec = cv2.solvePnP(
@@ -101,13 +98,24 @@ class ArUcoDetectionNode(Node):
                     self.matrix_coefficients, self.distortion_coefficients, 
                     flags=cv2.SOLVEPNP_IPPE_SQUARE
                 )
+                dist = np.linalg.norm(tvec)
+
+                if dist < self.dist_threshold:
+                    self.get_logger().info(f"Marker {ids[i]} found within range ({dist:.2f}m). Locking goal!")
+                    
+                    # Only stop spiral and lock once we are close enough to be accurate
+                    self.global_goal_sent = True 
+                    self.sync_pub.publish(Bool(data=True)) 
+                    self.ar_signal_pub.publish(Bool(data=True))
 
                 # Visualization for Rviz/Debug
-                cv2.aruco.drawDetectedMarkers(cv_image, corners)
-                cv2.drawFrameAxes(cv_image, self.matrix_coefficients, self.distortion_coefficients, rvec, tvec, 0.1)
+                    cv2.aruco.drawDetectedMarkers(cv_image, corners)
+                    cv2.drawFrameAxes(cv_image, self.matrix_coefficients, self.distortion_coefficients, rvec, tvec, 0.1)
 
-                # Mode P Logic: Publish goal if AR is NOT active (search complete)
-                self.process_and_publish_goal(tvec.flatten(), rvec.flatten())
+                    # Mode P Logic: Publish goal if AR is NOT active (search complete)
+                    self.process_and_publish_goal(tvec.flatten(), rvec.flatten())
+                else:
+                    self.get_logger().warn(f"Marker detected but too far ({dist:.2f}m). Continuing search...")
 
         self.debug_img_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "bgr8"))
 
