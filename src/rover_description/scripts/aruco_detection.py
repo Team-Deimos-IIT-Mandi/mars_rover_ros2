@@ -16,6 +16,9 @@ class ArUcoDetectionNode(Node):
         super().__init__('aruco_detector_node')
 
         # 1. Configuration Parameters
+        self.global_goal_sent = False
+        self.mission_started = False
+        self.start_sub = self.create_subscription(Bool, '/start_search', self.start_cb, 10)
         f = 554.26
         self.marker_size = 0.2  # 20cm as defined in your Xacro
         # self.matrix_coefficients = np.array([[1662.76, 0, 960.5],
@@ -29,18 +32,19 @@ class ArUcoDetectionNode(Node):
         # 2. Publishers and Subscribers
         # Updated to camera_2 as per your rover's latest configuration
         self.image_sub = self.create_subscription(Image, '/rgbd_camera/image', self.image_callback, 10)
-        self.ar_status_sub = self.create_subscription(Bool, '/AR_active', self.ar_status_callback, 10)
-        
+        self.ar_signal_pub = self.create_publisher(Bool, '/AR', 10)
         self.goal_pub = self.create_publisher(PoseStamped, '/goal_pose', 10)
         self.debug_img_pub = self.create_publisher(Image, '/aruco_debug_image', 10)
-
+        self.sync_sub = self.create_subscription(Bool, '/marker_goal_reached', self.sync_callback, 10)
+        self.sync_pub = self.create_publisher(Bool, '/marker_goal_reached', 10)
+    
         # 3. TF2 Setup
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
         
         self.bridge = CvBridge()
-        self.ar_active = True
-        self.goal_sent = False  # Defaults to TRUE so it WAITS for a signal to start publishing
+        # self.ar_active = True
+        self.marker_found = False  # Defaults to TRUE so it WAITS for a signal to start publishing
 
         # 4. ArUco Detector Initialization (Modern API)
         self.aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
@@ -57,12 +61,25 @@ class ArUcoDetectionNode(Node):
 
         self.get_logger().info("ArUco Detection Node (Camera 2) Started")
 
-    def ar_status_callback(self, msg):
-        self.ar_active = msg.data
-        if self.ar_active:
-            self.goal_sent = False
+    def start_cb(self, msg):
+        if msg.data:
+            self.mission_started = True
+            self.get_logger().info("Search signal received. Starting operation!")
+    
+    def sync_callback(self, msg):
+        """Updates the local lock based on what other cameras have found."""
+        self.global_goal_sent = msg.data
+        if self.global_goal_sent:
+            self.get_logger().info("Global Goal Lock Received. Silencing this node.")
 
     def image_callback(self, msg):
+
+        if not self.mission_started:
+            return
+
+        if self.global_goal_sent:
+            return
+        
         try:
             cv_image = self.bridge.imgmsg_to_cv2(msg, "bgr8")
         except Exception as e:
@@ -73,6 +90,10 @@ class ArUcoDetectionNode(Node):
         corners, ids, _ = self.detector.detectMarkers(gray)
 
         if ids is not None:
+            self.global_goal_sent = True # Lock locally immediately
+            self.sync_pub.publish(Bool(data=True)) # Lock globally
+            self.ar_signal_pub.publish(Bool(data=True)) # Stop spiral
+
             for i in range(len(ids)):
                 # solvePnP replaces the deprecated estimatePoseSingleMarkers
                 _, rvec, tvec = cv2.solvePnP(
@@ -86,8 +107,7 @@ class ArUcoDetectionNode(Node):
                 cv2.drawFrameAxes(cv_image, self.matrix_coefficients, self.distortion_coefficients, rvec, tvec, 0.1)
 
                 # Mode P Logic: Publish goal if AR is NOT active (search complete)
-                if not self.ar_active and not self.goal_sent:
-                    self.process_and_publish_goal(tvec.flatten(), rvec.flatten())
+                self.process_and_publish_goal(tvec.flatten(), rvec.flatten())
 
         self.debug_img_pub.publish(self.bridge.cv2_to_imgmsg(cv_image, "bgr8"))
 
