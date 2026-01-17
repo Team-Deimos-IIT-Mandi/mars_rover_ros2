@@ -81,7 +81,8 @@
         <origin xyz="0.2 0 0.1" rpy="0 0 0"/>
     </joint>
 
-    <gazebo reference="camera_link">
+    <!-- RGBD Camera sensor - handled by realsense2_camera or usb_cam ROS2 package -->
+    <!-- <gazebo reference="camera_link">
         <sensor name="rgbd_camera" type="rgbd_camera">
           <always_on>1</always_on>
           <update_rate>250</update_rate>
@@ -107,7 +108,7 @@
             </noise>
           </camera>
         </sensor>
-      </gazebo>
+      </gazebo> -->
 
     <link name="camera_link_1">
         <visual>
@@ -125,7 +126,8 @@
         <origin xyz="0.1 0.24 0.1" rpy="0 0 1.57"/>
     </joint>
 
-    <gazebo reference="camera_link_1">
+    <!-- Camera 1 sensor - handled by usb_cam ROS2 package -->
+    <!-- <gazebo reference="camera_link_1">
         <sensor name="camera_sensor_1" type="camera">
           <always_on>1</always_on>
           <update_rate>250</update_rate>
@@ -150,7 +152,7 @@
             </noise>
           </camera>
         </sensor>
-      </gazebo>
+      </gazebo> -->
 
     <link name="camera_link_2">
         <visual>
@@ -168,7 +170,8 @@
         <origin xyz="0.1 -0.24 0.1" rpy="0 0 -1.57"/>
     </joint>
 
-    <gazebo reference="camera_link_2">
+    <!-- Camera 2 sensor - handled by usb_cam ROS2 package -->
+    <!-- <gazebo reference="camera_link_2">
         <sensor name="camera_sensor_2" type="camera">
           <always_on>1</always_on>
           <update_rate>250</update_rate>
@@ -193,7 +196,7 @@
             </noise>
           </camera>
         </sensor>
-      </gazebo>
+      </gazebo> -->
 
     <link name="imu_link">
         <visual>
@@ -211,7 +214,8 @@
         <child link="imu_link"/>
     </joint>
 
-    <gazebo reference="imu_link">
+    <!-- IMU sensor - handled by appropriate IMU ROS2 driver package -->
+    <!-- <gazebo reference="imu_link">
       <sensor name="imu_sensor" type="imu">
       <always_on>1</always_on>
       <update_rate>250</update_rate>
@@ -219,7 +223,7 @@
       <topic>imu</topic>
       <gz_frame_id>imu_link</gz_frame_id>
       </sensor>
-    </gazebo>
+    </gazebo> -->
 
 
     <link name="gps_link"/>
@@ -229,14 +233,15 @@
         <origin xyz="0 0 0.5" rpy="0 0 0"/>
     </joint>
 
-    <gazebo reference="gps_link">
+    <!-- GPS sensor - handled by nmea_navsat_driver ROS2 package -->
+    <!-- <gazebo reference="gps_link">
       <sensor name="gps_link" type="navsat">
         <always_on>1</always_on>
         <update_rate>250</update_rate>
         <topic>gps/fix</topic>
         <gz_frame_id>gps_link</gz_frame_id>
       </sensor>
-    </gazebo>
+    </gazebo> -->
 
     <link name="lidar_link">
       <inertial>
@@ -262,7 +267,8 @@
       <origin xyz="0 0 0.2" rpy="0 0 0"/>
     </joint>
 
-    <gazebo reference="lidar_link">
+    <!-- LiDAR sensor - handled by rplidar_ros or ydlidar_ros2_driver ROS2 package -->
+    <!-- <gazebo reference="lidar_link">
       <sensor name="gpu_lidar" type="gpu_lidar">
         <pose>0 0 0 0 0 0</pose>
         <topic>scan</topic>
@@ -285,7 +291,7 @@
         </lidar>
         <visualize>true</visualize>
       </sensor>
-    </gazebo>
+    </gazebo> -->
 
       <link
         name="steering1">
@@ -779,7 +785,8 @@
 
     <ros2_control name="RobotController" type="system">
         <hardware>
-            <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+            <plugin>rover_hardware/RoverCANInterface</plugin>
+            <param name="can_interface">can0</param>
         </hardware>
         <joint name="wheel_1">
             <command_interface name="velocity"/>
@@ -803,24 +810,4 @@
         </joint>
     </ros2_control>
 
-    <gazebo>
-      <plugin
-        filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-        <parameters>/home/anish/test/mars_rover_ros2/src/rover_description/config/controllers.yaml</parameters>
-      </plugin>
-
-      <plugin
-        filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
-       <render_engine>ogre2</render_engine>
-      </plugin>
-
-      <plugin filename="gz-sim-imu-system"
-        name="gz::sim::systems::Imu">
-      </plugin>
-
-      <plugin
-        filename="gz-sim-navsat-system"
-        name="gz::sim::systems::NavSat">
-      </plugin>
-    </gazebo>
 </robot>
