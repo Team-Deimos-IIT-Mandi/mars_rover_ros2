@@ -1,0 +1,155 @@
+{
+    "configById": {
+        "Map!1": {
+            "layer": "map",
+            "followTopic": "/gps/fix",
+            "topicPath": "/gps/fix",
+            "zoomLevel": 17,
+            "center": {
+                "lat": 49.9,
+                "lon": 8.9
+            },
+            "disabledTopics": []
+        },
+        "3D!1": {
+            "cameraState": {
+                "distance": 30,
+                "perspective": true,
+                "phi": 60,
+                "thetaOffset": 0,
+                "targetOffset": [
+                    0,
+                    0,
+                    0
+                ],
+                "fovy": 45
+            },
+            "followMode": "follow-pose",
+            "followTf": "base_link",
+            "scene": {
+                "backgroundColor": "#0d1b2a"
+            },
+            "topics": {
+                "/scan": {
+                    "visible": true,
+                    "colorMode": "rainbow",
+                    "pointSize": 5
+                },
+                "/map": {
+                    "visible": true
+                },
+                "/trajectory": {
+                    "visible": true,
+                    "lineWidth": 3,
+                    "color": "#00ff00"
+                }
+            },
+            "layers": {
+                "grid": {
+                    "layerId": "foxglove.Grid",
+                    "color": "#1e3a5f80",
+                    "size": 100,
+                    "divisions": 100
+                }
+            }
+        },
+        "RawMessages!gps": {
+            "topicPath": "/gps/fix",
+            "title": "GPS Coordinates (Lat/Long/Alt)"
+        },
+        "RawMessages!navsat": {
+            "topicPath": "/gps/filtered",
+            "title": "Filtered GPS"
+        },
+        "Plot!position": {
+            "title": "EKF Position",
+            "paths": [
+                {
+                    "value": "/odometry/filtered.pose.pose.position.x",
+                    "label": "X Position",
+                    "color": "#e74c3c"
+                },
+                {
+                    "value": "/odometry/filtered.pose.pose.position.y",
+                    "label": "Y Position",
+                    "color": "#3498db"
+                }
+            ],
+            "xAxisVal": "timestamp",
+            "showLegend": true
+        },
+        "Plot!velocity": {
+            "title": "Velocity",
+            "paths": [
+                {
+                    "value": "/odometry/filtered.twist.twist.linear.x",
+                    "label": "Linear X",
+                    "color": "#2ecc71"
+                },
+                {
+                    "value": "/odometry/filtered.twist.twist.angular.z",
+                    "label": "Angular Z",
+                    "color": "#9b59b6"
+                }
+            ],
+            "xAxisVal": "timestamp",
+            "showLegend": true
+        },
+        "StateTransitions!1": {
+            "title": "Nav2 State"
+        },
+        "TopicGraph!1": {
+            "title": "ROS2 Node Graph"
+        },
+        "Diagnostics!1": {
+            "title": "System Status"
+        },
+        "Image!camera": {
+            "imageMode": {
+                "imageTopic": "/rgbd_camera/image"
+            },
+            "title": "Front Camera"
+        }
+    },
+    "globalVariables": {},
+    "userNodes": {},
+    "playbackConfig": {
+        "speed": 1
+    },
+    "layout": {
+        "direction": "row",
+        "first": {
+            "direction": "column",
+            "first": "Map!1",
+            "second": "3D!1",
+            "splitPercentage": 55
+        },
+        "second": {
+            "direction": "column",
+            "first": {
+                "direction": "column",
+                "first": "RawMessages!gps",
+                "second": "Image!camera",
+                "splitPercentage": 40
+            },
+            "second": {
+                "direction": "column",
+                "first": {
+                    "direction": "row",
+                    "first": "Plot!position",
+                    "second": "Plot!velocity",
+                    "splitPercentage": 50
+                },
+                "second": {
+                    "direction": "row",
+                    "first": "TopicGraph!1",
+                    "second": "Diagnostics!1",
+                    "splitPercentage": 50
+                },
+                "splitPercentage": 50
+            },
+            "splitPercentage": 45
+        },
+        "splitPercentage": 55
+    }
+}

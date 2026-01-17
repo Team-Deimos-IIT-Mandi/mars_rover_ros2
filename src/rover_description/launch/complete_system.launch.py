@@ -2,12 +2,12 @@
 """
 Complete Mars Rover System Launch File - SEQUENTIAL STARTUP
 Launches in order:
-  1. Gazebo + Bridges
+  1. Gazebo + Bridges + Foxglove
   2. Robot Controllers + State Publishers
   3. EKF + GPS localization
   4. Cartographer Mapping (optional, after controllers are ready)
   5. Nav2 Navigation (optional)
-  6. Rviz Visualization
+  6. Rviz Visualization (optional)
 """
 
 import os
@@ -15,6 +15,7 @@ import time
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument, OpaqueFunction
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -58,7 +59,8 @@ def launch_navigation(context, *args, **kwargs):
                 PythonLaunchDescriptionSource(nav_launch),
                 launch_arguments={
                     'use_sim_time': use_sim_time,
-                    'autostart': 'true'
+                    'autostart': 'true',
+                    'enable_foxglove': 'false'  # Foxglove already started
                 }.items()
             )
         ]
@@ -72,6 +74,7 @@ def generate_launch_description():
     gazebo_sim_launch = os.path.join(pkg_share, 'launch', 'gazebo_sim.launch.py')
     controllers_launch = os.path.join(pkg_share, 'launch', 'controllers.launch.py')
     ekf_navsat_launch = os.path.join(pkg_share, 'launch', 'dual_ekf_navsat.launch.py')
+    foxglove_launch_path = os.path.join(pkg_share, 'launch', 'foxglove.launch.py')
     
     # Rviz config
     rviz_config_file = os.path.join(pkg_share, 'config', 'rover.rviz')
@@ -80,6 +83,8 @@ def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     enable_mapping = LaunchConfiguration('enable_mapping', default='true')
     enable_navigation = LaunchConfiguration('enable_navigation', default='false')
+    enable_foxglove = LaunchConfiguration('enable_foxglove', default='true')
+    enable_rviz = LaunchConfiguration('enable_rviz', default='false')
     
     declare_use_sim_time = DeclareLaunchArgument(
         'use_sim_time',
@@ -99,10 +104,27 @@ def generate_launch_description():
         description='Enable Nav2 autonomous navigation (true/false)'
     )
     
-    # ========== SEQUENCE 1: Gazebo + Bridges + Robot State Publisher ==========
+    declare_enable_foxglove = DeclareLaunchArgument(
+        'enable_foxglove',
+        default_value='true',
+        description='Enable Foxglove bridge for web visualization'
+    )
+    
+    declare_enable_rviz = DeclareLaunchArgument(
+        'enable_rviz',
+        default_value='false',
+        description='Enable RViz visualization (default: false, use Foxglove instead)'
+    )
+    
+    # ========== SEQUENCE 1: Gazebo + Bridges + Robot State Publisher + Foxglove ==========
+    # Note: Foxglove will be launched by gazebo_sim.launch.py with 'complete_system' layout
+    # We'll override it to use our complete system layout instead
     gazebo_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(gazebo_sim_launch),
-        launch_arguments={'use_sim_time': use_sim_time}.items()
+        launch_arguments={
+            'use_sim_time': use_sim_time,
+            'enable_foxglove': 'false'  # We'll launch Foxglove separately with complete_system layout
+        }.items()
     )
     
     # ========== SEQUENCE 2: Controllers (waits for Gazebo) ==========
@@ -123,24 +145,38 @@ def generate_launch_description():
     # ========== SEQUENCE 5: Nav2 Navigation (optional) ==========
     navigation = OpaqueFunction(function=launch_navigation)
     
-    # ========== SEQUENCE 6: Rviz Visualization ==========
+    # ========== SEQUENCE 6: Rviz Visualization (optional) ==========
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
         name='rviz2',
         output='screen',
         arguments=['-d', rviz_config_file],
-        parameters=[{'use_sim_time': use_sim_time}]
+        parameters=[{'use_sim_time': use_sim_time}],
+        condition=IfCondition(enable_rviz)
+    )
+    
+    # ========== Foxglove Bridge with Complete System Layout ==========
+    foxglove_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(foxglove_launch_path),
+        launch_arguments={
+            'use_sim_time': use_sim_time,
+            'layout_name': 'complete_system'
+        }.items(),
+        condition=IfCondition(enable_foxglove)
     )
     
     return LaunchDescription([
         declare_use_sim_time,
         declare_enable_mapping,
         declare_enable_navigation,
-        gazebo_sim,           # 1. Gazebo + bridges
+        declare_enable_foxglove,
+        declare_enable_rviz,
+        gazebo_sim,           # 1. Gazebo + bridges (Foxglove disabled here)
+        foxglove_launch,      # 1b. Foxglove with complete_system layout
         controllers,          # 2. Controllers (depends on Gazebo)
         ekf_navsat,           # 3. Localization
         cartographer_delayed, # 4. Mapping (delayed start, optional)
         navigation,           # 5. Navigation (optional)
-        rviz_node,            # 6. Visualization
+        rviz_node,            # 6. RViz (optional, disabled by default)
     ])

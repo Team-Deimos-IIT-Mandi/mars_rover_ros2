@@ -1,11 +1,31 @@
 import os
+import subprocess
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import Command, LaunchConfiguration
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+
+
+def process_xacro_with_file_paths(xacro_file, pkg_share, model_file='arucoMarker0.dae'):
+    """Process xacro and convert package:// to file:// for Gazebo"""
+    # Run xacro to get URDF content
+    result = subprocess.run(
+        ['xacro', xacro_file, f'model_file:={model_file}'],
+        capture_output=True, text=True
+    )
+    urdf_content = result.stdout
+    
+    # Replace package:// with file:// for meshes
+    mesh_path = os.path.join(pkg_share, 'meshes')
+    urdf_content = urdf_content.replace(
+        'package://rover_description/meshes',
+        f'file://{mesh_path}'
+    )
+    return urdf_content
+
 
 def generate_launch_description():
     # 1. Setup paths
@@ -19,6 +39,15 @@ def generate_launch_description():
         launch_arguments={'use_sim_time': 'true'}.items()
     )
 
+    # Foxglove bridge for visualization
+    foxglove_bridge = Node(
+        package='foxglove_bridge',
+        executable='foxglove_bridge',
+        name='foxglove_bridge',
+        output='screen',
+        parameters=[{'use_sim_time': True}]
+    )
+
     args = [
         DeclareLaunchArgument('x', default_value='4.0'),
         DeclareLaunchArgument('y', default_value='2.0'),
@@ -30,10 +59,8 @@ def generate_launch_description():
         DeclareLaunchArgument('model_file', default_value='arucoMarker0.dae')
     ]
 
-    robot_description_content = Command([
-        'xacro ', xacro_file, 
-        ' model_file:=', LaunchConfiguration('model_file')
-    ])
+    # Process xacro with file:// paths for Gazebo
+    robot_description_content = process_xacro_with_file_paths(xacro_file, pkg_share)
 
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
@@ -62,6 +89,7 @@ def generate_launch_description():
 
     return LaunchDescription(args + [
         gazebo_sim,
+        foxglove_bridge,
         robot_state_publisher_node,
         spawn_aruco,
     ])

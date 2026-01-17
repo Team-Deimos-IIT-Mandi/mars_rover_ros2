@@ -20,10 +20,12 @@ def generate_launch_description():
 
     # Paths to config files
     nav2_params_file = os.path.join(pkg_share, 'config', 'nav2_gps_params.yaml')
+    foxglove_launch_path = os.path.join(pkg_share, 'launch', 'foxglove.launch.py')
     
     # Launch arguments
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     autostart = LaunchConfiguration('autostart', default='true')
+    enable_foxglove = LaunchConfiguration('enable_foxglove', default='true')
     
     declare_use_sim_time = DeclareLaunchArgument(
         'use_sim_time',
@@ -35,6 +37,12 @@ def generate_launch_description():
         'autostart',
         default_value='true',
         description='Automatically startup the nav2 stack'
+    )
+    
+    declare_enable_foxglove = DeclareLaunchArgument(
+        'enable_foxglove',
+        default_value='true',
+        description='Enable Foxglove bridge for GNSS visualization'
     )
     
     # Remap cmd_vel to diff_drive_controller topic
@@ -70,10 +78,22 @@ def generate_launch_description():
         output='screen',
         parameters=[{'use_sim_time': use_sim_time}]
     )
+    
+    # Foxglove bridge for GNSS visualization
+    foxglove_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(foxglove_launch_path),
+        launch_arguments={
+            'use_sim_time': use_sim_time,
+            'layout_name': 'gps_navigation'
+        }.items(),
+        condition=IfCondition(enable_foxglove)
+    )
 
     return LaunchDescription([
         declare_use_sim_time,
         declare_autostart,
+        declare_enable_foxglove,
         cmd_vel_relay,
         nav2_with_remappings,
+        foxglove_launch,
     ])
