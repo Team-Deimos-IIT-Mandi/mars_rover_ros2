@@ -20,11 +20,21 @@ install(
     scripts/aruco_detection2.py
     scripts/spiral_search.py
     scripts/mission_initializer.py
+    scripts/mallet_detection.py
+    scripts/mallet_detection1.py
+    scripts/mallet_detection2.py
+    scripts/spiral_search_od.py
+    scripts/rockpick_detection.py
+    scripts/rockpick_detection1.py
+    scripts/rockpick_detection2.py
+    scripts/bottle_detection.py
+    scripts/bottle_detection1.py
+    scripts/bottle_detection2.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
 install(
-  DIRECTORY launch urdf meshes config worlds scripts maps models
+  DIRECTORY launch urdf meshes config worlds scripts maps models rviz od_models
   DESTINATION share/${PROJECT_NAME}
 )
 

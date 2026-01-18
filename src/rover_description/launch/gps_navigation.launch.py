@@ -17,6 +17,7 @@ def generate_launch_description():
     # Get package directories
     pkg_share = get_package_share_directory('rover_description')
     nav2_bringup_dir = get_package_share_directory('nav2_bringup')
+    rviz_config_path = os.path.join(pkg_share, 'rviz', 'config.rviz')
 
     # Paths to config files
     nav2_params_file = os.path.join(pkg_share, 'config', 'nav2_gps_params.yaml')
@@ -71,9 +72,19 @@ def generate_launch_description():
         parameters=[{'use_sim_time': use_sim_time}]
     )
 
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        name='rviz2',
+        output='screen',
+        arguments=['-d', rviz_config_path],
+        parameters=[{'use_sim_time': use_sim_time}]
+    )
+
     return LaunchDescription([
         declare_use_sim_time,
         declare_autostart,
         cmd_vel_relay,
         nav2_with_remappings,
+        rviz_node,
     ])
