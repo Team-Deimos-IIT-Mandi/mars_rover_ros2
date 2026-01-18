@@ -16,6 +16,8 @@ class ArUcoDetectionNode(Node):
         super().__init__('aruco_detector_node')
 
         # 1. Configuration Parameters
+        self.detection_window = [] # Store last few detections
+        self.required_consecutive_frames = 3
         self.global_goal_sent = False
         self.dist_threshold = 6.5
         self.mission_started = False
@@ -50,6 +52,10 @@ class ArUcoDetectionNode(Node):
         # 4. ArUco Detector Initialization (Modern API)
         self.aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
         self.aruco_params = cv2.aruco.DetectorParameters()
+        self.aruco_params.minMarkerPerimeterRate = 0.12
+        self.aruco_params.polygonalApproxAccuracyRate = 0.015
+        self.aruco_params.errorCorrectionRate = 0.0
+        self.aruco_params.adaptiveThreshConstant = 15
         self.detector = cv2.aruco.ArucoDetector(self.aruco_dict, self.aruco_params)
 
         # Object points for solvePnP: corners of a square marker in its own frame
@@ -90,7 +96,14 @@ class ArUcoDetectionNode(Node):
         gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
         corners, ids, _ = self.detector.detectMarkers(gray)
 
-        if ids is not None:
+        if ids is not None and len(ids) > 0:
+            self.detection_window.append(True)
+            if len(self.detection_window) > self.required_consecutive_frames:
+                self.detection_window.pop(0)
+        else:
+            self.detection_window = []
+
+        if len(self.detection_window) >= self.required_consecutive_frames:
             for i in range(len(ids)):
                 # solvePnP replaces the deprecated estimatePoseSingleMarkers
                 _, rvec, tvec = cv2.solvePnP(
@@ -100,7 +113,7 @@ class ArUcoDetectionNode(Node):
                 )
                 dist = np.linalg.norm(tvec)
 
-                if dist < self.dist_threshold:
+                if dist < self.dist_threshold and dist>0.5:
                     self.get_logger().info(f"Marker {ids[i]} found within range ({dist:.2f}m). Locking goal!")
                     
                     # Only stop spiral and lock once we are close enough to be accurate
