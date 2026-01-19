@@ -785,8 +785,8 @@
 
     <ros2_control name="RoverHardware" type="system">
       <hardware>
-        <plugin>rover_hardware/RoverCANInterface</plugin>
-        <param name="can_interface">can0</param>
+        <plugin>rover_hardware/RoverSerialInterface</plugin>
+        <param name="serial_port">/dev/ttyACM0</param>
       </hardware>
     
       <joint name="front_left_wheel_joint">

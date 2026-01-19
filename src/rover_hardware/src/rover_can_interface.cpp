@@ -178,7 +178,7 @@ public:
     }
 
 private:
-    std::string serial_port_name_ = "/dev/ttyUSB0";
+    std::string serial_port_name_ = "/dev/ttyACM0";
     int serial_fd_ = -1;
     std::vector<double> hw_commands_;
     std::vector<double> hw_positions_;
