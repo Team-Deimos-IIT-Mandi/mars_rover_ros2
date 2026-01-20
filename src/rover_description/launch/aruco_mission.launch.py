@@ -7,14 +7,19 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 import os
 
+# Note: Foxglove bridge is started by aruco.launch.py -> gz_plus_control.launch.py -> gazebo_sim.launch.py
+# Connect to ws://localhost:8765 for visualization
+
 def generate_launch_description():
 
     pkg_share = get_package_share_directory('rover_description')
     aruco_gazebo_launch_path = os.path.join(pkg_share, 'launch', 'aruco.launch.py')
     navigation_path = os.path.join(pkg_share,'launch','gps_navigation.launch.py')
 
-    lat_arg = DeclareLaunchArgument('lat', default_value='0.0')
-    lon_arg = DeclareLaunchArgument('lon', default_value='0.0')
+    # Default GPS target - offset from world origin (49.9, 8.9) 
+    # These defaults create a target ~30m away from spawn point
+    lat_arg = DeclareLaunchArgument('lat', default_value='49.90027')  # ~30m north
+    lon_arg = DeclareLaunchArgument('lon', default_value='8.90036')   # ~30m east
     target_lat_val = LaunchConfiguration('lat')
     target_lon_val = LaunchConfiguration('lon')
 
@@ -72,6 +77,8 @@ def generate_launch_description():
                     }],output='screen')
 
     return LaunchDescription([
+        lat_arg,
+        lon_arg,
         aruco_gz_sim,
         navigation_launch,
         initializer_node,

@@ -132,6 +132,15 @@ def generate_launch_description():
         arguments=['-d', rviz_config_file],
         parameters=[{'use_sim_time': use_sim_time}]
     )
+
+    # ========== Foxglove Bridge for Web Visualization ==========
+    foxglove_bridge = Node(
+        package='foxglove_bridge',
+        executable='foxglove_bridge',
+        name='foxglove_bridge',
+        output='screen',
+        parameters=[{'use_sim_time': use_sim_time}]
+    )
     
     return LaunchDescription([
         declare_use_sim_time,
@@ -143,4 +152,5 @@ def generate_launch_description():
         cartographer_delayed, # 4. Mapping (delayed start, optional)
         navigation,           # 5. Navigation (optional)
         rviz_node,            # 6. Visualization
+        foxglove_bridge,      # 7. Foxglove (ws://localhost:8765)
     ])

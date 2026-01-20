@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import re
+import tempfile
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, SetEnvironmentVariable
@@ -20,6 +21,13 @@ def resolve_package_path(urdf_content, pkg_path):
         f'file://{mesh_path}'
     )
     
+    # Replace package://rover_description/models (for world files)
+    models_path = os.path.join(pkg_path, 'models')
+    urdf_content = urdf_content.replace(
+        'package://rover_description/models',
+        f'file://{models_path}'
+    )
+    
     # Regex to replace the hardcoded controllers.yaml path
     # Matches <parameters>.../config/controllers.yaml</parameters>
     pattern = r'<parameters>.*controllers\.yaml</parameters>'
@@ -33,20 +41,30 @@ def generate_launch_description():
     pkg_path = get_package_share_directory('rover_description')
     ros_gz_sim_dir = get_package_share_directory('ros_gz_sim')
     urdf_path = os.path.join(pkg_path, 'urdf', 'rover.urdf')
-    world_file = os.path.join(pkg_path, 'worlds', 'agriculture.world')
+    world_file_orig = os.path.join(pkg_path, 'worlds', 'agriculture.world')
     
     with open(urdf_path, 'r') as infp:
         robot_description = infp.read()
     
     # Process the URDF to fix paths
     robot_description = resolve_package_path(robot_description, pkg_path)
+    
+    # Process the world file to fix package:// paths
+    with open(world_file_orig, 'r') as f:
+        world_content = f.read()
+    world_content = resolve_package_path(world_content, pkg_path)
+    
+    # Write processed world to temp file
+    world_file = tempfile.NamedTemporaryFile(mode='w', suffix='.world', delete=False)
+    world_file.write(world_content)
+    world_file.close()
 
     gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(ros_gz_sim_dir, 'launch', 'gz_sim.launch.py')
         ),
         launch_arguments={
-            'gz_args': f'-r {world_file}',
+            'gz_args': f'-r {world_file.name}',
         }.items()
     )
 
@@ -97,10 +115,19 @@ def generate_launch_description():
             '-name', 'mars_rover',
             '-x', '0.0',
             '-y', '0.0',
-            '-z', '0.2',
+            '-z', '0.5',
             '-allow_renaming', 'true'
         ],
         output='screen'
+    )
+
+    # Foxglove bridge for web visualization
+    foxglove_bridge = Node(
+        package='foxglove_bridge',
+        executable='foxglove_bridge',
+        name='foxglove_bridge',
+        output='screen',
+        parameters=[{'use_sim_time': True}]
     )
 
     return LaunchDescription([
@@ -109,5 +136,6 @@ def generate_launch_description():
         cameras_lidar_bridge,
         imu_gps_bridge,
         robot_state_publisher,
-        spawn_robot, 
+        spawn_robot,
+        foxglove_bridge,
     ])

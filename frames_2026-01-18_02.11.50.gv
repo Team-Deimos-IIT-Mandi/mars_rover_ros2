@@ -1,0 +1,27 @@
+digraph G {
+"aruco_marker_1/basePole" -> "aruco_marker_1/arucoMarker"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"aruco_marker_1/world" -> "aruco_marker_1/basePole"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"utm" -> "map"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_footprint" -> "base_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"odom" -> "base_footprint"[label=" Broadcaster: default_authority\nAverage rate: 31.915\nBuffer length: 0.564\nMost recent transform: 33.896\nOldest transform: 33.332\n"];
+"chassis" -> "camera_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "chassis"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"chassis" -> "camera_link_1"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"chassis" -> "camera_link_2"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"base_link" -> "gps_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"chassis" -> "imu_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"chassis" -> "lidar_link"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"chassis" -> "steering1"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"chassis" -> "steering2"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"chassis" -> "steering4"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"chassis" -> "steering3"[label=" Broadcaster: default_authority\nAverage rate: 10000.0\nBuffer length: 0.0\nMost recent transform: 0.0\nOldest transform: 0.0\n"];
+"steering1" -> "wheel1"[label=" Broadcaster: default_authority\nAverage rate: 20.979\nBuffer length: 0.572\nMost recent transform: 33.904\nOldest transform: 33.332\n"];
+"steering2" -> "wheel2"[label=" Broadcaster: default_authority\nAverage rate: 20.979\nBuffer length: 0.572\nMost recent transform: 33.904\nOldest transform: 33.332\n"];
+"steering3" -> "wheel3"[label=" Broadcaster: default_authority\nAverage rate: 20.979\nBuffer length: 0.572\nMost recent transform: 33.904\nOldest transform: 33.332\n"];
+"steering4" -> "wheel4"[label=" Broadcaster: default_authority\nAverage rate: 20.979\nBuffer length: 0.572\nMost recent transform: 33.904\nOldest transform: 33.332\n"];
+"map" -> "odom"[label=" Broadcaster: default_authority\nAverage rate: 31.802\nBuffer length: 0.566\nMost recent transform: 33.9\nOldest transform: 33.334\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1768682510.4921908"[ shape=plaintext ] ;
+}->"utm";
+}

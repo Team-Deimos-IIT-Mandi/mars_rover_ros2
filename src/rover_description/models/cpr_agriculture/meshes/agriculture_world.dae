@@ -176,22 +176,22 @@
   </library_effects>
   <library_images>
     <image id="AgriBakeLarge" name="AgriBakeLarge">
-      <init_from>file:///home/naman72060/rover_ws/src/rover_description/models/cpr_agriculture/materials/textures/AgriBakeLarge.jpg</init_from>
+      <init_from>file:///home/anish/test/mars_rover_ros2/src/rover_description/models/cpr_agriculture/materials/textures/AgriBakeLarge.jpg</init_from>
     </image>
     <image id="MetalCorrugatedIronSheet002_METALNESS_3K_METALNESS_jpg" name="MetalCorrugatedIronSheet002_METALNESS_3K_METALNESS_jpg">
-      <init_from>file:///home/naman72060/rover_ws/src/rover_description/models/cpr_agriculture/materials/textures/MetalCorrugatedIronSheet002_METALNESS_3K_METALNESS.jpg</init_from>
+      <init_from>file:///home/anish/test/mars_rover_ros2/src/rover_description/models/cpr_agriculture/materials/textures/MetalCorrugatedIronSheet002_METALNESS_3K_METALNESS.jpg</init_from>
     </image>
     <image id="SolarPanelsPolycrystallineTypeBFramedClean001_COL_3K_jpg" name="SolarPanelsPolycrystallineTypeBFramedClean001_COL_3K_jpg">
-      <init_from>file:///home/naman72060/rover_ws/src/rover_description/models/cpr_agriculture/materials/textures/SolarPanelsPolycrystallineTypeBFramedClean001_COL_3K.jpg</init_from>
+      <init_from>file:///home/anish/test/mars_rover_ros2/src/rover_description/models/cpr_agriculture/materials/textures/SolarPanelsPolycrystallineTypeBFramedClean001_COL_3K.jpg</init_from>
     </image>
     <image id="WoodPlanksWorn33_COL_VAR1_3K_jpg" name="WoodPlanksWorn33_COL_VAR1_3K_jpg">
-      <init_from>file:///home/naman72060/rover_ws/src/rover_description/models/cpr_agriculture/materials/textures/WoodPlanksWorn33_COL_VAR1_3K.jpg</init_from>
+      <init_from>file:///home/anish/test/mars_rover_ros2/src/rover_description/models/cpr_agriculture/materials/textures/WoodPlanksWorn33_COL_VAR1_3K.jpg</init_from>
     </image>
     <image id="WoodPlanksWornRed33_COL_VAR1_3K_jpg" name="WoodPlanksWornRed33_COL_VAR1_3K_jpg">
-      <init_from>file:///home/naman72060/rover_ws/src/rover_description/models/cpr_agriculture/materials/textures/WoodPlanksWornRed33_COL_VAR1_3K.jpg</init_from>
+      <init_from>file:///home/anish/test/mars_rover_ros2/src/rover_description/models/cpr_agriculture/materials/textures/WoodPlanksWornRed33_COL_VAR1_3K.jpg</init_from>
     </image>
     <image id="WoodPlanksWornWhite33_COL_VAR1_3K_jpg" name="WoodPlanksWornWhite33_COL_VAR1_3K_jpg">
-      <init_from>file:///home/naman72060/rover_ws/src/rover_description/models/cpr_agriculture/materials/textures/WoodPlanksWornWhite33_COL_VAR1_3K.jpg</init_from>
+      <init_from>file:///home/anish/test/mars_rover_ros2/src/rover_description/models/cpr_agriculture/materials/textures/WoodPlanksWornWhite33_COL_VAR1_3K.jpg</init_from>
     </image>
   </library_images>
   <library_materials>
