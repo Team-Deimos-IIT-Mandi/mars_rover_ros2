@@ -99,7 +99,7 @@ public:
     {
         std::fill(hw_commands_.begin(), hw_commands_.end(), 0.0);
         RCLCPP_INFO(rclcpp::get_logger("RoverSerial"), "✓ Hardware interface ACTIVATED - Ready to receive commands");
-        RCLCPP_INFO(rclcpp::get_logger("RoverSerial"), "   Listening for cmd_vel on topic: /diff_drive_controller/cmd_vel_unstamped");
+        RCLCPP_INFO(rclcpp::get_logger("RoverSerial"), "   Listening for cmd_vel on topic: /diff_drive_controller/cmd_vel");
         RCLCPP_INFO(rclcpp::get_logger("RoverSerial"), "   Serial port: %s", serial_port_name_.c_str());
         return hardware_interface::CallbackReturn::SUCCESS;
     }
