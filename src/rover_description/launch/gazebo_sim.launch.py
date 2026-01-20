@@ -103,11 +103,34 @@ def generate_launch_description():
         output='screen'
     )
 
+    # Foxglove Bridge - for web-based visualization
+    foxglove_bridge = Node(
+        package='foxglove_bridge',
+        executable='foxglove_bridge',
+        name='foxglove_bridge',
+        output='screen',
+        parameters=[{
+            'port': 8765,
+            'address': '0.0.0.0',
+            'tls': False,
+            'topic_whitelist': ['.*'],
+            'service_whitelist': ['.*'],
+            'param_whitelist': ['.*'],
+            'send_buffer_limit': 10000000,
+            'use_compression': True,
+            'use_sim_time': True,
+            'capabilities': ['clientPublish', 'parameters', 'parametersSubscribe', 
+                           'services', 'connectionGraph', 'assets'],
+            'asset_uri_allowlist': ['^package://.*'],
+        }]
+    )
+
     return LaunchDescription([
         gz_sim,
         clock_bridge,
         cameras_lidar_bridge,
         imu_gps_bridge,
         robot_state_publisher,
-        spawn_robot, 
+        spawn_robot,
+        foxglove_bridge,
     ])

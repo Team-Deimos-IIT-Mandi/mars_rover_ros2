@@ -10,6 +10,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <chrono>
 
 namespace rover_hardware
 {
@@ -127,8 +128,19 @@ public:
 
     hardware_interface::return_type read(const rclcpp::Time &, const rclcpp::Duration &) override
     {
-        uint8_t buffer[128]; // Increased buffer size
+        static uint32_t packets_received = 0;
+        static uint32_t read_errors = 0;
+        static auto last_debug_time = std::chrono::steady_clock::now();
+        
+        uint8_t buffer[128];
         int n = ::read(serial_fd_, buffer, sizeof(buffer));
+        
+        if (n < 0) {
+            read_errors++;
+            RCLCPP_ERROR_THROTTLE(rclcpp::get_logger("RoverSerial"), *rclcpp::Clock::make_shared(), 1000,
+                                  "Serial read error: %s (total errors: %u)", strerror(errno), read_errors);
+            return hardware_interface::return_type::OK;
+        }
         
         if (n >= (int)sizeof(FeedbackPacket)) {
             // Scan buffer for valid packet
@@ -136,6 +148,8 @@ public:
                 if (buffer[i] == 0xA5 && buffer[i + sizeof(FeedbackPacket) - 1] == 0x5A) {
                     FeedbackPacket fb;
                     std::memcpy(&fb, &buffer[i], sizeof(fb));
+                    
+                    packets_received++;
 
                     // --- DIRECT MAPPING (No Mirroring) ---
                     
@@ -154,6 +168,15 @@ public:
                     // Rear Right (Index 3)
                     hw_positions_[3] = (double)fb.rr_pos;
                     hw_velocities_[3] = (double)fb.rr_vel;
+                    
+                    // Debug output (throttled to every 2 seconds)
+                    auto now = std::chrono::steady_clock::now();
+                    if (std::chrono::duration_cast<std::chrono::seconds>(now - last_debug_time).count() >= 2) {
+                        RCLCPP_INFO(rclcpp::get_logger("RoverSerial"),
+                                    "📥 RX Feedback #%u | FL: %.2f rad/s | RL: %.2f rad/s | FR: %.2f rad/s | RR: %.2f rad/s",
+                                    packets_received, fb.fl_vel, fb.rl_vel, fb.fr_vel, fb.rr_vel);
+                        last_debug_time = now;
+                    }
                 }
             }
         }
@@ -162,6 +185,10 @@ public:
 
     hardware_interface::return_type write(const rclcpp::Time &, const rclcpp::Duration &) override
     {
+        static uint32_t packets_sent = 0;
+        static uint32_t write_errors = 0;
+        static auto last_cmd_debug_time = std::chrono::steady_clock::now();
+        
         CommandPacket cmd;
         cmd.header = 0xA5;
         
@@ -173,7 +200,31 @@ public:
         
         cmd.terminator = 0x5A;
 
-        ::write(serial_fd_, &cmd, sizeof(cmd));
+        ssize_t bytes_written = ::write(serial_fd_, &cmd, sizeof(cmd));
+        
+        if (bytes_written < 0) {
+            write_errors++;
+            RCLCPP_ERROR_THROTTLE(rclcpp::get_logger("RoverSerial"), *rclcpp::Clock::make_shared(), 1000,
+                                  "Serial write error: %s (total errors: %u)", strerror(errno), write_errors);
+            return hardware_interface::return_type::ERROR;
+        }
+        
+        if (bytes_written != sizeof(cmd)) {
+            RCLCPP_WARN_THROTTLE(rclcpp::get_logger("RoverSerial"), *rclcpp::Clock::make_shared(), 1000,
+                                 "Incomplete write: %ld/%lu bytes", bytes_written, sizeof(cmd));
+        } else {
+            packets_sent++;
+        }
+        
+        // Debug output (throttled to every 500ms to see commands more frequently)
+        auto now = std::chrono::steady_clock::now();
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - last_cmd_debug_time).count() >= 500) {
+            RCLCPP_INFO(rclcpp::get_logger("RoverSerial"),
+                        "📤 TX Command #%u → FL: %.3f | RL: %.3f | FR: %.3f | RR: %.3f rad/s",
+                        packets_sent, cmd.fl_vel, cmd.rl_vel, cmd.fr_vel, cmd.rr_vel);
+            last_cmd_debug_time = now;
+        }
+        
         return hardware_interface::return_type::OK;
     }
 

@@ -46,9 +46,32 @@ def generate_launch_description():
         arguments=["joint_state_broadcaster"],
     )
 
+    # Foxglove Bridge - for web-based visualization
+    foxglove_bridge = Node(
+        package='foxglove_bridge',
+        executable='foxglove_bridge',
+        name='foxglove_bridge',
+        output='screen',
+        parameters=[{
+            'port': 8765,
+            'address': '0.0.0.0',
+            'tls': False,
+            'topic_whitelist': ['.*'],
+            'service_whitelist': ['.*'],
+            'param_whitelist': ['.*'],
+            'send_buffer_limit': 10000000,
+            'use_compression': True,
+            'use_sim_time': False,
+            'capabilities': ['clientPublish', 'parameters', 'parametersSubscribe', 
+                           'services', 'connectionGraph', 'assets'],
+            'asset_uri_allowlist': ['^package://.*'],
+        }]
+    )
+
     return LaunchDescription([
         control_node,
         robot_state_pub_node,
         diff_drive_spawner,
-        joint_broadcaster_spawner
+        joint_broadcaster_spawner,
+        foxglove_bridge
     ])

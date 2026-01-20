@@ -134,6 +134,30 @@ def generate_launch_description():
     #     output='screen'
     # )
     
+    # ============ FOXGLOVE BRIDGE ============
+    
+    # Foxglove Bridge - for web-based visualization
+    foxglove_bridge = Node(
+        package='foxglove_bridge',
+        executable='foxglove_bridge',
+        name='foxglove_bridge',
+        output='screen',
+        parameters=[{
+            'port': 8765,
+            'address': '0.0.0.0',
+            'tls': False,
+            'topic_whitelist': ['.*'],
+            'service_whitelist': ['.*'],
+            'param_whitelist': ['.*'],
+            'send_buffer_limit': 10000000,
+            'use_compression': True,
+            'use_sim_time': LaunchConfiguration('use_sim_time'),
+            'capabilities': ['clientPublish', 'parameters', 'parametersSubscribe', 
+                           'services', 'connectionGraph', 'assets'],
+            'asset_uri_allowlist': ['^package://.*'],
+        }]
+    )
+    
     # ============ LAUNCH DESCRIPTION ============
     
     return LaunchDescription([
@@ -151,4 +175,7 @@ def generate_launch_description():
         gps_node,
         # imu_node,  # Uncomment when IMU driver is configured
         lidar_node,
+        
+        # Visualization
+        foxglove_bridge,
     ])
