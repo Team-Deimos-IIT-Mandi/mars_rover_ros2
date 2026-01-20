@@ -98,6 +98,9 @@ public:
     hardware_interface::CallbackReturn on_activate(const rclcpp_lifecycle::State &) override
     {
         std::fill(hw_commands_.begin(), hw_commands_.end(), 0.0);
+        RCLCPP_INFO(rclcpp::get_logger("RoverSerial"), "✓ Hardware interface ACTIVATED - Ready to receive commands");
+        RCLCPP_INFO(rclcpp::get_logger("RoverSerial"), "   Listening for cmd_vel on topic: /diff_drive_controller/cmd_vel_unstamped");
+        RCLCPP_INFO(rclcpp::get_logger("RoverSerial"), "   Serial port: %s", serial_port_name_.c_str());
         return hardware_interface::CallbackReturn::SUCCESS;
     }
 
@@ -187,7 +190,7 @@ public:
     {
         static uint32_t packets_sent = 0;
         static uint32_t write_errors = 0;
-        static auto last_cmd_debug_time = std::chrono::steady_clock::now();
+        static uint32_t zero_commands = 0;
         
         CommandPacket cmd;
         cmd.header = 0xA5;
@@ -200,29 +203,41 @@ public:
         
         cmd.terminator = 0x5A;
 
+        // Check if all commands are zero
+        bool all_zero = (fabs(cmd.fl_vel) < 0.001 && fabs(cmd.rl_vel) < 0.001 && 
+                         fabs(cmd.fr_vel) < 0.001 && fabs(cmd.rr_vel) < 0.001);
+        
+        if (all_zero) {
+            zero_commands++;
+        }
+
         ssize_t bytes_written = ::write(serial_fd_, &cmd, sizeof(cmd));
         
         if (bytes_written < 0) {
             write_errors++;
-            RCLCPP_ERROR_THROTTLE(rclcpp::get_logger("RoverSerial"), *rclcpp::Clock::make_shared(), 1000,
-                                  "Serial write error: %s (total errors: %u)", strerror(errno), write_errors);
+            RCLCPP_ERROR(rclcpp::get_logger("RoverSerial"),
+                         "✗ Serial write error: %s (total errors: %u)", strerror(errno), write_errors);
             return hardware_interface::return_type::ERROR;
         }
         
         if (bytes_written != sizeof(cmd)) {
-            RCLCPP_WARN_THROTTLE(rclcpp::get_logger("RoverSerial"), *rclcpp::Clock::make_shared(), 1000,
-                                 "Incomplete write: %ld/%lu bytes", bytes_written, sizeof(cmd));
+            RCLCPP_WARN(rclcpp::get_logger("RoverSerial"),
+                        "⚠ Incomplete write: %ld/%lu bytes", bytes_written, sizeof(cmd));
         } else {
             packets_sent++;
         }
         
-        // Debug output (throttled to every 500ms to see commands more frequently)
-        auto now = std::chrono::steady_clock::now();
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(now - last_cmd_debug_time).count() >= 500) {
+        // Log EVERY command (not throttled) to debug why motors aren't responding
+        if (!all_zero) {
             RCLCPP_INFO(rclcpp::get_logger("RoverSerial"),
-                        "📤 TX Command #%u → FL: %.3f | RL: %.3f | FR: %.3f | RR: %.3f rad/s",
-                        packets_sent, cmd.fl_vel, cmd.rl_vel, cmd.fr_vel, cmd.rr_vel);
-            last_cmd_debug_time = now;
+                        "📤 TX #%u → FL: %.3f | RL: %.3f | FR: %.3f | RR: %.3f rad/s [%ld bytes]",
+                        packets_sent, cmd.fl_vel, cmd.rl_vel, cmd.fr_vel, cmd.rr_vel, bytes_written);
+        } else {
+            // Log zero commands less frequently
+            if (zero_commands % 100 == 1) {
+                RCLCPP_WARN(rclcpp::get_logger("RoverSerial"),
+                            "⚠ Sending ZERO velocities (count: %u) - No cmd_vel received?", zero_commands);
+            }
         }
         
         return hardware_interface::return_type::OK;
