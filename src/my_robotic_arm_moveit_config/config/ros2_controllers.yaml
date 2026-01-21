@@ -1,0 +1,51 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 100  # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    arm_group_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+    gripper_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
+arm_group_controller:
+  ros__parameters:
+    joints:
+      - Joint_1
+      - Joint_2
+      - Joint_3
+      - Joint_4
+      - Joint_5
+      - Joint_6
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    allow_nonzero_velocity_at_trajectory_end: true
+    
+    # YAHAN HUMNE TOLERANCE BADHAYI HAI
+    constraints:
+      goal_time: 2.0
+      stopped_velocity_tolerance: 0.05
+      Joint_1: {trajectory: 0.5, goal: 0.1}
+      Joint_2: {trajectory: 0.5, goal: 0.1}
+      Joint_3: {trajectory: 0.5, goal: 0.1}
+      Joint_4: {trajectory: 0.5, goal: 0.1}
+      Joint_5: {trajectory: 0.5, goal: 0.1}
+      Joint_6: {trajectory: 0.5, goal: 0.1}
+
+gripper_controller:
+  ros__parameters:
+    joints:
+      - Finger_1
+      - Finger_2
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    allow_nonzero_velocity_at_trajectory_end: true

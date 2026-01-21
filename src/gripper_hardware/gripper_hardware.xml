@@ -1,0 +1,9 @@
+<library path="gripper_hardware_lib">
+  <class name="gripper_hardware/GripperHardwareInterface"
+         type="gripper_hardware::GripperHardwareInterface"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      ROS 2 Control hardware interface for a 2-finger prismatic gripper.
+    </description>
+  </class>
+</library>

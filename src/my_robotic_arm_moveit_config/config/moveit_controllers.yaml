@@ -1,0 +1,26 @@
+# This list is what MoveIt looks for first!
+controller_names:
+  - arm_controller
+  - gripper_controller
+
+# Definition for the arm
+arm_controller:
+  action_ns: follow_joint_trajectory
+  type: FollowJointTrajectory
+  default: true
+  joints:
+    - Joint_1
+    - Joint_2
+    - Joint_3
+    - Joint_4
+    - Joint_5
+    - Joint_6
+
+# Definition for the gripper (optional, but good to have if you added it)
+gripper_controller:
+  action_ns: follow_joint_trajectory
+  type: FollowJointTrajectory
+  default: true
+  joints:
+    - Finger_1
+    - Finger_2
