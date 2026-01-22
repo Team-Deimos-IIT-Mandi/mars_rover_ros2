@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<robot name="orange_mallet">
+
+  <link name="handle">
+    <visual>
+      <geometry>
+        <cylinder length="0.3" radius="0.02"/>
+      </geometry>
+      <material name="orange">
+        <color rgba="1.0 0.5 0.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.3" radius="0.02"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.5"/>
+      <inertia ixx="0.0038" ixy="0" ixz="0" iyy="0.0038" iyz="0" izz="0.0001"/>
+    </inertial>
+  </link>
+
+  <link name="head">
+    <visual>
+      <geometry>
+        <cylinder length="0.15" radius="0.05"/>
+      </geometry>
+      <material name="orange">
+        <color rgba="1.0 0.5 0.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.15" radius="0.05"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1.0"/>
+      <inertia ixx="0.0025" ixy="0" ixz="0" iyy="0.0025" iyz="0" izz="0.00125"/>
+    </inertial>
+  </link>
+
+  <joint name="handle_to_head" type="fixed">
+    <parent link="handle"/>
+    <child link="head"/>
+    <origin xyz="0 0 0.15" rpy="1.5708 0 0"/>
+  </joint>
+
+  <gazebo reference="handle">
+    <visual>
+      <material>
+        <ambient>1.0 0.5 0.0 1.0</ambient>
+        <diffuse>1.0 0.5 0.0 1.0</diffuse>
+        <specular>0.1 0.1 0.1 1.0</specular>
+      </material>
+    </visual>
+  </gazebo>
+
+  <gazebo reference="head">
+    <visual>
+      <material>
+        <ambient>1.0 0.5 0.0 1.0</ambient>
+        <diffuse>1.0 0.5 0.0 1.0</diffuse>
+        <specular>0.1 0.1 0.1 1.0</specular>
+      </material>
+    </visual>
+  </gazebo>
+
+</robot>

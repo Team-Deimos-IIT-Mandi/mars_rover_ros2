@@ -20,8 +20,8 @@ def generate_launch_description():
     )
 
     args = [
-        DeclareLaunchArgument('x', default_value='4.0'),
-        DeclareLaunchArgument('y', default_value='2.0'),
+        DeclareLaunchArgument('x', default_value='29.16'),
+        DeclareLaunchArgument('y', default_value='-15.56'),
         DeclareLaunchArgument('z', default_value='0.35'), 
         DeclareLaunchArgument('roll', default_value='0.0'),
         DeclareLaunchArgument('pitch', default_value='0.0'),
@@ -52,7 +52,7 @@ def generate_launch_description():
             '-topic', f'/{aruco_namespace}/robot_description',
             '-x', LaunchConfiguration('x'),
             '-y', LaunchConfiguration('y'),
-            '-z', '0.0',
+            '-z', '-0.35',
             '-R', LaunchConfiguration('roll'),
             '-P', LaunchConfiguration('pitch'),
             '-Y', '0.0',

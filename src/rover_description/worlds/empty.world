@@ -47,26 +47,26 @@
         <collision name="collision">
           <geometry>
             <box>
-              <size>20 20 0.1</size>
+              <size>80 80 0.1</size>
             </box>
           </geometry>
         </collision>
         <visual name="visual">
           <geometry>
             <box>
-              <size>20 20 0.1</size>
+              <size>80 80 0.1</size>
             </box>
           </geometry>
           <material>
-            <ambient>0.8 0.8 0.8 1</ambient>
-            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <ambient>0.5 0.5 0.5 1</ambient>
+            <diffuse>0.5 0.5 0.5 1</diffuse>
           </material>
         </visual>
       </link>
       <pose>0 0 -0.05 0 0 0</pose>
     </model>
     
-    <model name="wall_1">
+    <!-- <model name="wall_1">
       <static>true</static>
       <link name="link">
         <collision name="collision">
@@ -88,9 +88,9 @@
         </visual>
       </link>
       <pose>0 10 1.5 0 0 0</pose>
-    </model>
+    </model> -->
     
-    <model name="container_1">
+    <!-- <model name="container_1">
       <static>true</static>
       <link name="link">
         <collision name="collision">
@@ -138,7 +138,7 @@
         </visual>
       </link>
       <pose>-3 -3 0.5 0 0 0</pose>
-    </model>
+    </model> -->
 
     <spherical_coordinates>
     <surface_model>EARTH_WGS84</surface_model>

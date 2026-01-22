@@ -33,7 +33,7 @@ def generate_launch_description():
     pkg_path = get_package_share_directory('rover_description')
     ros_gz_sim_dir = get_package_share_directory('ros_gz_sim')
     urdf_path = os.path.join(pkg_path, 'urdf', 'rover.urdf')
-    world_file = os.path.join(pkg_path, 'worlds', 'empty.world')
+    world_file = os.path.join(pkg_path, 'worlds', 'agriculture.world')
     
     with open(urdf_path, 'r') as infp:
         robot_description = infp.read()
