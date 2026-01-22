@@ -10,16 +10,16 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 def generate_launch_description():
     # 1. Setup paths
     pkg_share = get_package_share_directory('rover_description')
-    gz_plus_controller_path = os.path.join(pkg_share, 'launch', 'gz_plus_control.launch.py')
     xacro_file = os.path.join(pkg_share, 'urdf', 'aruco_marker.xacro')
     aruco_namespace = 'aruco_marker_1'
 
-    gazebo_sim = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(gz_plus_controller_path),
-        launch_arguments={'use_sim_time': 'true'}.items()
-    )
-
+    # Launch arguments
     args = [
+        DeclareLaunchArgument(
+            'use_sim_time',
+            default_value='false',
+            description='Use simulation time (set to false for hardware)'
+        ),
         DeclareLaunchArgument('x', default_value='4.0'),
         DeclareLaunchArgument('y', default_value='2.0'),
         DeclareLaunchArgument('z', default_value='0.35'), 
@@ -41,29 +41,14 @@ def generate_launch_description():
         name='robot_state_publisher',
         namespace=aruco_namespace,
         output='screen',
-        parameters=[{'robot_description': robot_description_content, 'use_sim_time': True, 'frame_prefix': f'{aruco_namespace}/'}]
+        parameters=[{'robot_description': robot_description_content, 'use_sim_time': LaunchConfiguration('use_sim_time'), 'frame_prefix': f'{aruco_namespace}/'}]
     )
 
-    spawn_aruco = Node(
-        package='ros_gz_sim',
-        executable='create',
-        arguments=[
-            '-entity', LaunchConfiguration('model_name'),
-            '-topic', f'/{aruco_namespace}/robot_description',
-            '-x', LaunchConfiguration('x'),
-            '-y', LaunchConfiguration('y'),
-            '-z', '0.0',
-            '-R', LaunchConfiguration('roll'),
-            '-P', LaunchConfiguration('pitch'),
-            '-Y', '0.0',
-        ],
-        output='screen'
-    )
+    # NOTE: spawn_aruco node removed - it's Gazebo-specific and not needed for hardware
+    # If you need Gazebo simulation, use a separate simulation-specific launch file
 
     return LaunchDescription(args + [
-        gazebo_sim,
         robot_state_publisher_node,
-        spawn_aruco,
     ])
 
 

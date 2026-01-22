@@ -1,0 +1,27 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 50  # Hz
+
+    diff_drive_controller:
+      type: diff_drive_controller/DiffDriveController
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+diff_drive_controller:
+  ros__parameters:
+    left_wheel_names: ["front_left_wheel_joint", "rear_left_wheel_joint"]
+    right_wheel_names: ["front_right_wheel_joint", "rear_right_wheel_joint"]
+
+    wheel_separation: 0.575  # Distance between wheels in meters
+    wheel_radius: 0.113      # Radius of your wheels in meters
+
+    use_stamped_vel: false
+    publish_rate: 50.0
+
+    # Odometry settings
+    open_loop: false 
+    position_feedback: true
+    enable_odom_tf: true
+    base_frame_id: base_link
+    odom_frame_id: odom

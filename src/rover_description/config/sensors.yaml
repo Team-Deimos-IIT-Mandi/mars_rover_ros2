@@ -1,0 +1,83 @@
+# Sensor Configuration for Mars Rover Hardware
+# This file contains parameters for all sensors used with the actual rover hardware
+
+# NOTE: All three cameras are USB-connected (no CSI cameras)
+# Adjust device paths (/dev/videoX) according to your actual hardware setup on Jetson Nano
+
+# RGBD/Depth Camera (front-facing) - USB connected
+# For Intel RealSense: use realsense2_camera package instead of usb_cam
+# For generic USB  camera: use usb_cam package
+rgbd_camera:
+  ros__parameters:
+    video_device: "/dev/video0"  # Adjust based on your USB camera enumeration
+    framerate: 30
+    image_width: 640
+    image_height: 480
+    pixel_format: "yuyv"  # or "mjpeg" for better performance
+    camera_frame_id: "camera_link"
+    io_method: "mmap"
+    camera_name: "rgbd_camera"
+    camera_info_url: ""  # Add camera calibration file path if available
+
+# Camera 1 (left side camera) - USB connected
+camera_1:
+  ros__parameters:
+    video_device: "/dev/video1"  # USB camera device
+    framerate: 30
+    image_width: 640
+    image_height: 480
+    pixel_format: "yuyv"  # or "mjpeg" for better performance
+    camera_frame_id: "camera_link_1"
+    io_method: "mmap"
+    camera_name: "camera_1"
+    camera_info_url: ""  # Add camera calibration file path if available
+
+# Camera 2 (right side camera) - USB connected
+camera_2:
+  ros__parameters:
+    video_device: "/dev/video2"  # USB camera device
+    framerate: 30
+    image_width: 640
+    image_height: 480
+    pixel_format: "yuyv"  # or "mjpeg" for better performance
+    camera_frame_id: "camera_link_2"
+    io_method: "mmap"
+    camera_name: "camera_2"
+    camera_info_url: ""  # Add camera calibration file path if available
+
+# IMU Sensor
+# Note: Parameters depend on your specific IMU driver package
+imu_sensor:
+  ros__parameters:
+    frame_id: "imu_link"
+    # For I2C IMU (e.g., MPU6050):
+    # i2c_bus: 1
+    # i2c_address: 0x68
+    # For Serial IMU:
+    # port: "/dev/ttyUSB0"
+    # baudrate: 115200
+
+# GPS Module
+gps_sensor:
+  ros__parameters:
+    frame_id: "gps_link"
+    port: "/dev/ttyUSB0"  # Adjust based on actual GPS serial port
+    baud: 9600
+    use_GNSS_time: false
+    time_ref_source: "gps"
+    useRMC: false
+
+# LiDAR Sensor
+# Note: Parameters depend on your specific LiDAR model
+lidar_sensor:
+  ros__parameters:
+    serial_port: "/dev/ttyUSB1"  # Adjust based on actual LiDAR port
+    serial_baudrate: 115200  # Common for RPLidar
+    frame_id: "lidar_link"
+    inverted: false
+    angle_compensate: true
+    # For RPLidar:
+    # scan_mode: "Standard"
+    # For YDLidar:
+    # range_min: 0.1
+    # range_max: 10.0
