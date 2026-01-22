@@ -1,9 +1,9 @@
 <library path="rover_hardware">
-  <class name="rover_hardware/RoverSerialInterface"
-         type="rover_hardware::RoverSerialInterface"
+  <class name="rover_hardware/RoverCANInterface"
+         type="rover_hardware::RoverCANInterface"
          base_class_type="hardware_interface::SystemInterface">
     <description>
-      Serial Hardware Interface for ESP32 Bridge.
+      UART Hardware Interface for ESP32 Bridge with CAN slaves.
     </description>
   </class>
 </library>

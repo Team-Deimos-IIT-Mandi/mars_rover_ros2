@@ -37,6 +37,11 @@ install(
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
 )
+install(
+  PROGRAMS scripts/imu_publisher.py
+  DESTINATION lib/${PROJECT_NAME}
+  RENAME imu_publisher_jetson
+)
 
 install(
   DIRECTORY include/

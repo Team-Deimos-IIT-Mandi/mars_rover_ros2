@@ -4,7 +4,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <limits>
 
 #include "hardware_interface/handle.hpp"
 #include "hardware_interface/hardware_info.hpp"
@@ -12,55 +11,87 @@
 #include "hardware_interface/types/hardware_interface_return_values.hpp"
 #include "rclcpp/macros.hpp"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
-#include "rclcpp/rclcpp.hpp"
-
-// Linux SocketCAN
-#include <linux/can.h>
-#include <linux/can/raw.h>
-#include <net/if.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
+#include "rclcpp_lifecycle/state.hpp"
 
 namespace rover_hardware
 {
+
+// ===== BINARY PROTOCOL STRUCTURES =====
+#pragma pack(push, 1)
+struct CommandPacket {
+    uint8_t header = 0xA5;
+    float fl_vel;  // rad/s
+    float rl_vel;  // rad/s
+    float fr_vel;  // rad/s
+    float rr_vel;  // rad/s
+    uint8_t terminator = 0x5A;
+};
+
+struct FeedbackPacket {
+    uint8_t header = 0xA5;
+    float fl_pos; float fl_vel;
+    float rl_pos; float rl_vel;
+    float fr_pos; float fr_vel;
+    float rr_pos; float rr_vel;
+    uint8_t terminator = 0x5A;
+};
+#pragma pack(pop)
 
 class RoverCANInterface : public hardware_interface::SystemInterface
 {
 public:
   RCLCPP_SHARED_PTR_DEFINITIONS(RoverCANInterface)
 
-  // Lifecycle Node Interface
-  hardware_interface::CallbackReturn on_init(const hardware_interface::HardwareInfo & info) override;
-  hardware_interface::CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state) override;
-  hardware_interface::CallbackReturn on_cleanup(const rclcpp_lifecycle::State & previous_state) override;
-  hardware_interface::CallbackReturn on_activate(const rclcpp_lifecycle::State & previous_state) override;
-  hardware_interface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State & previous_state) override;
+  hardware_interface::CallbackReturn on_init(
+    const hardware_interface::HardwareInfo & info) override;
 
-  // Hardware Interface
+  hardware_interface::CallbackReturn on_configure(
+    const rclcpp_lifecycle::State & previous_state) override;
+
   std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
+
   std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
-  hardware_interface::return_type read(const rclcpp::Time & time, const rclcpp::Duration & period) override;
-  hardware_interface::return_type write(const rclcpp::Time & time, const rclcpp::Duration & period) override;
+
+  hardware_interface::CallbackReturn on_activate(
+    const rclcpp_lifecycle::State & previous_state) override;
+
+  hardware_interface::CallbackReturn on_deactivate(
+    const rclcpp_lifecycle::State & previous_state) override;
+
+  hardware_interface::CallbackReturn on_cleanup(
+    const rclcpp_lifecycle::State & previous_state) override;
+
+  hardware_interface::return_type read(
+    const rclcpp::Time & time, const rclcpp::Duration & period) override;
+
+  hardware_interface::return_type write(
+    const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
 private:
-  // --- Parameters ---
-  std::string can_interface_name_ = "can0";
-  int can_id_left_cmd_ = 0x10;   // Send Command to Left
-  int can_id_right_cmd_ = 0x11;  // Send Command to Right
+  // UART communication
+  int uart_fd_;
+  std::string uart_port_;
+  int uart_baudrate_;
   
-  // ESP32 sends FEEDBACK on these IDs
-  int can_id_left_fb_ = 0x20;    
-  int can_id_right_fb_ = 0x21;
-
-  // --- Communication ---
-  int socket_can_fd_ = -1;
-  
-  // --- Data Storage ---
-  // Order for Differential Drive Controller usually: FL, RL, FR, RR
-  // Note: We mirror FL->RL and FR->RR because we only have 2 real controllers
-  std::vector<double> hw_commands_;
+  // Wheel state storage
   std::vector<double> hw_positions_;
   std::vector<double> hw_velocities_;
+  std::vector<double> hw_commands_;
+  
+  // UART receive buffer
+  std::vector<uint8_t> rx_buffer_;
+  
+  // Communication stats
+  unsigned long packets_sent_;
+  unsigned long packets_received_;
+  unsigned long packet_errors_;
+  
+  // Helper functions
+  bool openUART();
+  bool configureUART();
+  void closeUART();
+  bool readFeedbackPacket(FeedbackPacket& packet);
+  bool sendCommandPacket(const CommandPacket& packet);
 };
 
 }  // namespace rover_hardware
