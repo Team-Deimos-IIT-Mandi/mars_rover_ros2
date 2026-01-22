@@ -8,9 +8,9 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, GroupAction
 from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution 
 from launch_ros.actions import Node, PushRosNamespace
-from nav2_common.launch import RewrittenYaml
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
@@ -20,17 +20,18 @@ def generate_launch_description():
     rviz_config_path = os.path.join(pkg_share, 'rviz', 'config.rviz')
 
     # Paths to config files
-    nav2_params_file = os.path.join(pkg_share, 'config', 'nav2_gps_params.yaml')
+    params_file = LaunchConfiguration('params_file')
     
+    # Declare the argument so it can be passed from the terminal
+    declare_params_file = DeclareLaunchArgument(
+        'params_file',
+        default_value=os.path.join(pkg_share, 'config', 'nav2_gps_params.yaml'),
+        description='Full path to the ROS2 parameters file to use for all launched nodes'
+    )
     # Launch arguments
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
     autostart = LaunchConfiguration('autostart', default='true')
     
-    declare_use_sim_time = DeclareLaunchArgument(
-        'use_sim_time',
-        default_value='true',
-        description='Use simulation (Gazebo) clock if true'
-    )
     
     declare_autostart = DeclareLaunchArgument(
         'autostart',
@@ -42,6 +43,11 @@ def generate_launch_description():
     remappings = [
         ('/cmd_vel', '/diff_drive_controller/cmd_vel'),
     ]
+    full_params_path = PathJoinSubstitution([
+        FindPackageShare('rover_description'),
+        'config',
+        LaunchConfiguration('params_file')
+    ])
     
     # Nav2 bringup with remappings
     nav2_bringup = IncludeLaunchDescription(
@@ -51,7 +57,7 @@ def generate_launch_description():
         launch_arguments={
             'use_sim_time': use_sim_time,
             'autostart': autostart,
-            'params_file': nav2_params_file,
+            'params_file': full_params_path,
             'use_composition': 'False',
             'use_respawn': 'False',
         }.items(),
@@ -82,7 +88,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        declare_use_sim_time,
+        declare_params_file,
         declare_autostart,
         cmd_vel_relay,
         nav2_with_remappings,

@@ -26,7 +26,7 @@ def generate_launch_description():
     )
 
     args = [
-        DeclareLaunchArgument('x', default_value='3.5'),
+        DeclareLaunchArgument('x', default_value='29.16'),
         DeclareLaunchArgument('y', default_value='0.0'),
         DeclareLaunchArgument('z', default_value='0.5'), 
         DeclareLaunchArgument('roll', default_value='0.0'),

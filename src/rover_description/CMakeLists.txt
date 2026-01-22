@@ -30,6 +30,7 @@ install(
     scripts/bottle_detection.py
     scripts/bottle_detection1.py
     scripts/bottle_detection2.py
+    scripts/spiral_search_alone.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

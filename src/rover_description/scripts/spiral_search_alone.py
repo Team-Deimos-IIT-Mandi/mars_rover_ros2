@@ -5,81 +5,56 @@ from rclpy.node import Node
 from geometry_msgs.msg import PoseStamped, Point
 from nav_msgs.msg import Odometry
 from visualization_msgs.msg import Marker
-from std_msgs.msg import Bool
 import math
 import numpy as np
-
-def quaternion_from_euler(ai, aj, ak):
-    ai /= 2.0; aj /= 2.0; ak /= 2.0
-    ci = math.cos(ai); si = math.sin(ai)
-    cj = math.cos(aj); sj = math.sin(aj)
-    ck = math.cos(ak); sk = math.sin(ak)
-    cc = ci*ck; cs = ci*sk; sc = si*ck; ss = si*sk
-
-    q = np.empty((4, ))
-    q[0] = sc * cj - cs * sj
-    q[1] = cc * sj + ss * cj
-    q[2] = cs * cj - sc * sj
-    q[3] = cc * cj + ss * sj
-    return q
 
 class SpiralWaypointGenerator(Node):
     def __init__(self):
         super().__init__('spiral_waypoint_generator')
 
         # Parameters
-        self.threshold_distance = 2.0
-        self.mission_started = False
-        self.initial_pose = None
-        self.spiral_radius = 30.0
-        self.step_increment = 0.1
+        self.threshold_distance = 1.5  # Distance (meters) to consider a waypoint reached
+        self.initial_pose = None       # Set automatically on first odom
+        self.spiral_radius = 30.0      # Total distance from center
+        self.step_increment = 0.2      # Density of points (0.2 is smooth for Nav2)
         self.waypoints = []
         
         self.current_position = None
-        self.stop_search = False
-
-        # QoS Profiles
-        qos_profile = 10
 
         # Subscribers
-        self.odom_subscriber = self.create_subscription(Odometry, '/odometry/local', self.odom_callback, qos_profile)
-        self.ar_subscriber = self.create_subscription(Bool, '/stop_search', self.stop_search_callback, qos_profile)
-        self.start_sub = self.create_subscription(Bool, '/start_search', self.start_cb, 10)
+        # Listens to odometry to determine start location and track progress
+        self.odom_subscriber = self.create_subscription(
+            Odometry, 
+            '/odometry/local', 
+            self.odom_callback, 
+            10)
         
         # Publishers
-        self.goal_publisher = self.create_publisher(PoseStamped, '/goal_pose', qos_profile)
-        self.marker_publisher = self.create_publisher(Marker, '/waypoints_marker', qos_profile)
+        self.goal_publisher = self.create_publisher(PoseStamped, '/goal_pose', 10)
+        self.marker_publisher = self.create_publisher(Marker, '/waypoints_marker', 10)
 
-        # Timer
+        # Timer: Checks distance and manages the mission every 500ms
         self.timer = self.create_timer(0.5, self.control_loop)
 
-        self.get_logger().info("Spiral Search Node Started")
-
-    def start_cb(self, msg):
-        if msg.data:
-            self.mission_started = True
-            self.get_logger().info("Search signal received. Starting operation!")
-
-    def stop_search_callback(self, msg):
-        if msg.data:
-            self.stop_search = True
-            self.waypoints = [] 
-            self.get_logger().warn("SPIRAL ABORTED: Object detected.")
+        self.get_logger().info("Spiral Search Node Initialized. Awaiting Odometry to begin...")
 
     def generate_spiral_waypoints(self):
+        """Generates an Archimedean spiral starting from the current initial_pose."""
         waypoints = []
         t = 0.0
         while t <= self.spiral_radius:
+            # Formula: r = a * theta
+            # x = center_x + (a * theta * cos(theta))
             x = self.initial_pose.x + (math.cos(t) * t / 3.0)
             y = self.initial_pose.y + (math.sin(t) * t / 3.0)
             
             waypoint = PoseStamped()
             waypoint.header.frame_id = 'odom'
-            # SYNC FIX: Using a clean timestamp for generated waypoints
             waypoint.header.stamp = self.get_clock().now().to_msg()
             waypoint.pose.position = Point(x=x, y=y, z=0.0)
             
-            tangent_angle = math.atan2(y + t * math.cos(t), x - t * math.sin(t))
+            # Orientation: Pointing toward the next curve in the spiral
+            tangent_angle = math.atan2(y - self.initial_pose.y, x - self.initial_pose.x)
             q = self.euler_to_quaternion(0, 0, tangent_angle)
             
             waypoint.pose.orientation.x = q[0]
@@ -93,23 +68,26 @@ class SpiralWaypointGenerator(Node):
         return waypoints
 
     def euler_to_quaternion(self, roll, pitch, yaw):
+        """Helper to convert euler angles to geometry_msgs Quaternion."""
         qx = math.sin(roll/2) * math.cos(pitch/2) * math.cos(yaw/2) - math.cos(roll/2) * math.sin(pitch/2) * math.sin(yaw/2)
         qy = math.cos(roll/2) * math.sin(pitch/2) * math.cos(yaw/2) + math.sin(roll/2) * math.cos(pitch/2) * math.sin(yaw/2)
         qz = math.cos(roll/2) * math.cos(pitch/2) * math.sin(yaw/2) - math.sin(roll/2) * math.sin(pitch/2) * math.cos(yaw/2)
         qw = math.cos(roll/2) * math.cos(pitch/2) * math.cos(yaw/2) + math.sin(roll/2) * math.sin(pitch/2) * math.sin(yaw/2)
         return [qx, qy, qz, qw]
 
-    def publish_waypoints_markers(self):
+    def publish_markers(self):
+        """Visualizes the remaining path in RViz."""
+        if not self.waypoints: return
         marker = Marker()
         marker.header.frame_id = 'odom'
         marker.header.stamp = self.get_clock().now().to_msg()
-        marker.ns = 'spiral_waypoints'
+        marker.ns = 'spiral_path'
         marker.id = 0
-        marker.type = Marker.POINTS
+        marker.type = Marker.LINE_STRIP
         marker.action = Marker.ADD
-        marker.pose.orientation.w = 1.0
-        marker.scale.x = 0.2; marker.scale.y = 0.2
-        marker.color.a = 1.0; marker.color.r = 1.0
+        marker.scale.x = 0.1  # Line width
+        marker.color.a = 1.0
+        marker.color.r = 0.0; marker.color.g = 1.0; marker.color.b = 1.0 # Cyan line
 
         for wp in self.waypoints:
             marker.points.append(wp.pose.position)
@@ -120,31 +98,40 @@ class SpiralWaypointGenerator(Node):
         self.current_position = msg.pose.pose.position
 
     def control_loop(self):
-        if not self.mission_started: return
-        if self.stop_search or self.current_position is None: return
+        # Wait for the first odom message
+        if self.current_position is None:
+            return
 
+        # Phase 1: Initialize Mission
         if self.initial_pose is None:
             self.initial_pose = self.current_position
             self.waypoints = self.generate_spiral_waypoints()
-            self.get_logger().info(f"Generated {len(self.waypoints)} waypoints.")
-        
-        self.publish_waypoints_markers()
-        
-        if self.waypoints:
-            if self.stop_search: return
-            next_wp = self.waypoints[0].pose.position
-            distance = math.sqrt((self.current_position.x - next_wp.x)**2 +
-                                 (self.current_position.y - next_wp.y)**2)
+            self.get_logger().info(f"Center fixed at: {self.initial_pose.x:.2f}, {self.initial_pose.y:.2f}")
+            self.get_logger().info(f"Spiral generated with {len(self.waypoints)} points. Starting now.")
             
+            # Send the first goal immediately
+            if self.waypoints:
+                first_goal = self.waypoints.pop(0)
+                first_goal.header.stamp = self.get_clock().now().to_msg()
+                self.goal_publisher.publish(first_goal)
+
+        self.publish_markers()
+        
+        # Phase 2: Mission Tracking
+        if self.waypoints:
+            next_wp = self.waypoints[0].pose.position
+            dx = self.current_position.x - next_wp.x
+            dy = self.current_position.y - next_wp.y
+            distance = math.sqrt(dx**2 + dy**2)
+            
+            # If robot is within threshold, pop the next waypoint and send to Nav2
             if distance < self.threshold_distance:
                 goal_msg = self.waypoints.pop(0)
-                # SYNC FIX: Ensure the published goal has the absolute LATEST time
-                # Or set to 0.0 (rclpy.time.Time().to_msg()) if Nav2 is being stubborn
-                goal_msg.header.stamp = rclpy.time.Time().to_msg()
+                goal_msg.header.stamp = self.get_clock().now().to_msg()
                 self.goal_publisher.publish(goal_msg)
-                self.get_logger().info("Next waypoint published.")
+                self.get_logger().info(f"Target reached. {len(self.waypoints)} waypoints remaining.")
         else:
-            self.get_logger().info("Spiral Search Finished", once=True)
+            self.get_logger().info("Spiral Search Complete. All waypoints processed.", once=True)
 
 def main(args=None):
     rclpy.init(args=args)
@@ -154,9 +141,8 @@ def main(args=None):
     except KeyboardInterrupt:
         pass
     finally:
-        if rclpy.ok():
-            node.destroy_node()
-            rclpy.shutdown()
+        node.destroy_node()
+        rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

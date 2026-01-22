@@ -1,31 +1,21 @@
-from launch import LaunchDescription
-from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration,PathJoinSubstitution
-from ament_index_python.packages import get_package_share_directory
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
 import os
+from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch.actions import IncludeLaunchDescription, DeclareLaunchArgument
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration,PathJoinSubstitution
+from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
-
+    # 1. Path Setup
+    # Replace 'rover_description' with your actual package name if different
     pkg_share = get_package_share_directory('rover_description')
-    gz_plus_controller_path = os.path.join(pkg_share, 'launch', 'gz_plus_control.launch.py')
     navigation_path = os.path.join(pkg_share,'launch','gps_navigation.launch.py')
-
-    lat_arg = DeclareLaunchArgument('lat', default_value='0.0')
-    lon_arg = DeclareLaunchArgument('lon', default_value='0.0')
-    target_lat_val = LaunchConfiguration('lat')
-    target_lon_val = LaunchConfiguration('lon')
-    params_file = LaunchConfiguration('params_file')
+    
+    # 2. Launch Configurations
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
-
-
-    gazebo_sim = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(gz_plus_controller_path),
-        launch_arguments={'use_sim_time': 'true'}.items()
-    )
+    params_file = LaunchConfiguration('params_file')
 
     declare_params_file = DeclareLaunchArgument(
         'params_file',
@@ -47,24 +37,17 @@ def generate_launch_description():
         }.items()
     )
 
-
-    initializer_node = Node(
-        package='rover_description',
-        executable='gnss_final.py',
-        name='mission_initializer',
-        parameters=[{
-            'use_sim_time': True,
-            'target_lat': target_lat_val,
-            'target_lon': target_lon_val,
-        }],
+    # 4. Your Spiral Generator Node
+    spiral_node = Node(
+        package='rover_description',      # Your package name
+        executable='spiral_search_alone.py',  # The name you gave in setup.py/CMake
+        name='spiral_waypoint_generator',
         output='screen',
-        emulate_tty=True 
+        parameters=[{'use_sim_time': use_sim_time}]
     )
 
-
     return LaunchDescription([
-        gazebo_sim,
         declare_params_file,
         navigation_launch,
-        initializer_node,
+        spiral_node
     ])

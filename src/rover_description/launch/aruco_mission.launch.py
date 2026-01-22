@@ -1,11 +1,12 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration,PathJoinSubstitution
 from ament_index_python.packages import get_package_share_directory
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 import os
+from launch_ros.substitutions import FindPackageShare
 
 def generate_launch_description():
 
@@ -17,15 +18,31 @@ def generate_launch_description():
     lon_arg = DeclareLaunchArgument('lon', default_value='0.0')
     target_lat_val = LaunchConfiguration('lat')
     target_lon_val = LaunchConfiguration('lon')
+    params_file = LaunchConfiguration('params_file')
+    use_sim_time = LaunchConfiguration('use_sim_time', default='true')
 
     aruco_gz_sim = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(aruco_gazebo_launch_path),
         launch_arguments={'use_sim_time': 'true'}.items()
     )
     
+    declare_params_file = DeclareLaunchArgument(
+        'params_file',
+        default_value=os.path.join(pkg_share, 'config', 'nav2_gps_params.yaml'),
+        description='Path to the nav2 parameters file'
+    )
+    full_params_path = PathJoinSubstitution([
+        FindPackageShare('rover_description'),
+        'config',
+        LaunchConfiguration('params_file')
+    ])
+
     navigation_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(navigation_path),
-        launch_arguments={'use_sim_time': 'true'}.items()
+        launch_arguments={
+            'use_sim_time': use_sim_time,
+            'params_file': full_params_path
+        }.items()
     )
 
     initializer_node = Node(
@@ -73,6 +90,7 @@ def generate_launch_description():
 
     return LaunchDescription([
         aruco_gz_sim,
+        declare_params_file,
         navigation_launch,
         initializer_node,
         spiral_node,
