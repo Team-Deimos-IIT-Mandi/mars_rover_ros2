@@ -1,0 +1,22 @@
+/**:
+  ros__parameters:
+    # I2C configuration
+    i2c_bus: 1  # Usually /dev/i2c-1 on Jetson
+    i2c_address: 0x0C  # IST8310 default I2C address
+    
+    frame_id: "imu_link"
+    
+    # Update rate
+    publish_rate: 50.0  # Hz
+    
+    # Calibration (you'll need to calibrate these)
+    mag_offset_x: 0.0
+    mag_offset_y: 0.0
+    mag_offset_z: 0.0
+    mag_scale_x: 1.0
+    mag_scale_y: 1.0
+    mag_scale_z: 1.0
+    
+    # Declination angle (set based on your location)
+    # Find yours at: https://www.magnetic-declination.com/
+    magnetic_declination_radians: 0.0

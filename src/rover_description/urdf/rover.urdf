@@ -402,7 +402,7 @@
     </gazebo>
 
       <joint
-        name="wheel_1"
+        name="front_left_wheel_joint"
         type="continuous">
         <origin
           xyz="0.000353156675627797 0.0676257237290513 -0.216586122585117"
@@ -524,7 +524,7 @@
     </gazebo>
 
       <joint
-        name="wheel_2"
+        name="rear_left_wheel_joint"
         type="continuous">
         <origin
           xyz="0.00260503655999339 -0.0673405250297557 -0.216999105202697"
@@ -646,7 +646,7 @@
     </gazebo>
 
       <joint
-        name="wheel_3"
+        name="rear_right_wheel_joint"
         type="continuous">
         <origin
           xyz="-0.000555418729084156 -0.067625619393596 -0.216581022537134"
@@ -769,7 +769,7 @@
     </gazebo>
 
       <joint
-        name="wheel_4"
+        name="front_right_wheel_joint"
         type="continuous">
         <origin
           xyz="-0.00146559562126541 0.0673855594536285 -0.21697972522299"
@@ -789,7 +789,6 @@
         <param name="uart_port">/dev/ttyTHS1</param>  <!-- Jetson UART port -->
         <param name="uart_baudrate">115200</param>
       </hardware>
-
       <joint name="front_left_wheel_joint">
         <command_interface name="velocity">
           <param name="min">-26.18</param>  <!-- rad/s -->

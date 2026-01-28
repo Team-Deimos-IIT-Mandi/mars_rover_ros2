@@ -1,0 +1,20 @@
+/**:
+  ros__parameters:
+    # Serial port configuration
+    device: "/dev/ttyUSB0"  # Change based on your connection
+    baud: 38400  # u-blox M8N default baudrate
+    
+    # Frame IDs
+    frame_id: "gps_link"
+    
+    # NMEA configuration
+    use_GNSS_time: false
+    time_ref_source: "gps"
+    useRMC: false
+    
+    # u-blox specific settings
+    nav_rate: 10  # Navigation rate in Hz
+    enable_gps: true
+    enable_glonass: true
+    enable_beidou: false
+    enable_qzss: false
